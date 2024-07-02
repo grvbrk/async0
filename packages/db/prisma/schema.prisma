@@ -18,11 +18,11 @@ model User {
 model Problem {
   id                    String       @id @default(uuid())
   name                  String
-  description           String
   difficulty            Difficulty   @default(NA)
+  isActiveForSubmission Boolean      @default(true)
+  starterCode           String
   submissions           Submission[]
   testcases             Testcase[]
-  isActiveForSubmission Boolean      @default(true)
   topics                Topic[]
   List                  List[]
   createdAt             DateTime     @default(now())
@@ -30,30 +30,28 @@ model Problem {
 }
 
 model Submission {
-  id        String   @id @default(uuid())
-  status    Status   @default(Pending)
-  User      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String?
-  Problem   Problem? @relation(fields: [problemId], references: [id])
-  problemId String?
+  id              String   @id @default(uuid())
+  status          Status   @default(Pending)
+  User            User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+  Problem         Problem? @relation(fields: [problemId], references: [id])
+  problemId       String
+  testcaseResults Json?
+  passedTestcases Int
+  totalTestcases  Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
+
+  @@index([userId])
+  @@index([problemId])
 }
 
 model Testcase {
-  id          String           @id @default(uuid())
-  description String
-  solution    String
-  status      TestcaseStatus[]
-  Problem     Problem?         @relation(fields: [problemId], references: [id], onDelete: Cascade)
-  problemId   String?
-}
-
-model TestcaseStatus {
-  id         String    @id @default(uuid())
-  status     Status    @default(Pending)
-  Testcase   Testcase? @relation(fields: [testcaseId], references: [id], onDelete: Cascade)
-  testcaseId String?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @default(now()) @updatedAt
+  id        String   @id @default(uuid())
+  input     String
+  output    String
+  Problem   Problem? @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  problemId String?
 }
 
 enum Status {
