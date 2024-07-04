@@ -6,15 +6,18 @@ import Editor from "@monaco-editor/react";
 import { Send } from "lucide-react";
 import { editor } from "monaco-editor";
 import { useRef, useState } from "react";
-import axios from "axios";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 
 type CodeEditorPropsType = {
   placeholderCode: string;
+  handleTestcaseSubmission: (code: string) => void;
 };
 
-export default function CodeEditor({ placeholderCode }: CodeEditorPropsType) {
+export default function CodeEditor({
+  placeholderCode,
+  handleTestcaseSubmission,
+}: CodeEditorPropsType) {
   const { data: session } = useSession();
   const [value, setValue] = useState<string>("");
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
@@ -30,32 +33,6 @@ export default function CodeEditor({ placeholderCode }: CodeEditorPropsType) {
   function showValue() {
     if (editorRef.current) {
       setValue(editorRef.current.getValue());
-    }
-  }
-
-  async function handleProblemSubmit() {
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_JUDGE0_URL}/submissions/?base64_encoded=false`,
-        {
-          source_code: 'console.log("hello, Judge0")',
-          language_id: "63",
-          stdin: "Judge0",
-          expected_output: "hello, Judge0",
-        }
-      );
-      const token = response.data.token;
-      setTimeout(async () => {
-        try {
-          const res = await axios.get(
-            `${process.env.NEXT_PUBLIC_JUDGE0_URL}/submissions/${token}?base64_encoded=false`
-          );
-        } catch (error) {
-          console.log("Error fetching submission with token", error);
-        }
-      }, 3000);
-    } catch (error) {
-      console.log("Error submitting code", error);
     }
   }
 
@@ -90,7 +67,7 @@ export default function CodeEditor({ placeholderCode }: CodeEditorPropsType) {
             className="border border-black"
             type="submit"
             onClick={(e) => {
-              handleProblemSubmit();
+              handleTestcaseSubmission(value);
               if (!session) {
                 toast.error("You need to login first");
                 e.preventDefault();
@@ -103,7 +80,7 @@ export default function CodeEditor({ placeholderCode }: CodeEditorPropsType) {
             size="lg"
             type="submit"
             onClick={(e) => {
-              handleProblemSubmit();
+              handleTestcaseSubmission(value);
               if (!session) {
                 toast.error("You need to login first");
                 e.preventDefault();
