@@ -1,8 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import Editor from "@monaco-editor/react";
+import { Card, CardContent } from "@/components/ui/card";
+import Editor, { Monaco } from "@monaco-editor/react";
 import { ChevronUp, Send } from "lucide-react";
 import { editor } from "monaco-editor";
 import { useEffect, useRef, useState } from "react";
@@ -28,9 +28,12 @@ export default function CodeEditor({
   const [showMessages, setShowMessages] = useState<boolean>(false);
   const [showConsole, setShowConsole] = useState<boolean>(false);
 
-  function handleMount(editor: editor.IStandaloneCodeEditor) {
+  function handleMount(editor: editor.IStandaloneCodeEditor, monaco: Monaco) {
     editorRef.current = editor;
     editor.focus();
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+      editor.getAction("editor.action.formatDocument")?.run();
+    });
   }
 
   function handleRunOrSubmit() {
@@ -54,7 +57,7 @@ export default function CodeEditor({
       <div className="p-4 mt-2">
         <Card className="relative ">
           <Editor
-            className="rounded-md overflow-hidden"
+            className="rounded-md overflow-hidden z-10"
             height="75vh"
             theme="vs-dark"
             defaultLanguage="javascript"
@@ -63,17 +66,32 @@ export default function CodeEditor({
             onChange={(value) => setValue(value!)}
             onMount={handleMount}
             options={{
-              fontSize: 14,
+              fontSize: 16,
               lineNumbers: "on",
+              lineHeight: 23,
               minimap: { enabled: false },
               padding: { top: 20 },
-              suggestOnTriggerCharacters: true,
               quickSuggestions: true,
-              wordBasedSuggestions: "currentDocument",
+              suggestOnTriggerCharacters: true,
+              multiCursorModifier: "alt",
+              cursorBlinking: "smooth",
+              mouseWheelScrollSensitivity: 3,
+              find: {
+                cursorMoveOnType: true,
+                addExtraSpaceOnTop: true,
+                loop: true,
+              },
+              smoothScrolling: true,
+              tabCompletion: "on",
+              formatOnPaste: true,
+              formatOnType: true,
+              overviewRulerBorder: false,
+              hideCursorInOverviewRuler: true,
+              copyWithSyntaxHighlighting: true,
             }}
           />
           {showConsole && (
-            <Card className="absolute bottom-0 h-2/5 w-full rounded-md  transition-all duration-400 ease-in-out overflow-scroll">
+            <Card className="absolute bottom-0 h-2/5 w-full rounded-md  transition-all duration-400 ease-in-out overflow-y-auto box-border border border-gray-600 bg-grey-900 font-fira-code z-50">
               <CardContent className="mt-4">
                 <ShowResults
                   isPending={isPending}
@@ -120,16 +138,24 @@ export default function CodeEditor({
 function ConsoleData({ problem, index }: { problem: any; index: number }) {
   return (
     <>
-      <h1 className="text-md ">
-        Testcase-{index}:{" "}
+      <h1 className="text-md text-white ">
         <span>
           {problem.value.status.id === 3 ? (
-            <span className="text-green-700 font-bold text-md">PASS</span>
+            <span className="text-green-400 font-bold text-md">
+              {`~ testcase-${index} PASS `}
+              <span>{`${problem.value.time * 1000}ms `}</span>
+            </span>
           ) : problem.value.status.id === 4 ? (
-            <span className="text-red-700 font-bold text-md">FAIL</span>
+            <span className="text-red-500 font-bold text-md">
+              {`~ testcase-${index} FAIL `}
+              <span>{`${problem.value.time * 1000}ms `}</span>
+            </span>
           ) : [5, 6, 7, 8, 9, 10, 11, 12].includes(problem.value.status.id) ? (
             <>
-              <span className="text-yellow-600 font-bold text-md">TLE</span>
+              <span className="text-yellow-600 font-bold text-md ">
+                {`~ testcase-${index} TLE `}
+                <span className="text-red-500">{`${problem.value.time * 1000}ms `}</span>
+              </span>
               {/* <pre className=""> {problem.value.stderr}</pre> */}
             </>
           ) : (
@@ -181,8 +207,10 @@ function ShowResults({
 
   return (
     <>
-      {showFirstMessage && <h1>Running Tests...</h1>}
-      {showSecondMessage && <h1>Gathering Results...</h1>}
+      {showFirstMessage && <h1 className="text-white">~ Running Tests...</h1>}
+      {showSecondMessage && (
+        <h1 className="text-white">~ Gathering Results...</h1>
+      )}
       {!isPending &&
         problemStatus.map((problem: any, index: number) => {
           return <ConsoleData problem={problem} index={index} />;

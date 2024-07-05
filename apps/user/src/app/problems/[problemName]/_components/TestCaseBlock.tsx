@@ -47,7 +47,7 @@ export default function TestCaseBlock({
               : ""
           } text-sm font-medium`}
         >
-          problemStatus - {index}
+          Testcase - {index}
         </CardTitle>
         {isPending ? (
           <LoaderCircle className="animate-spin size-5" />
