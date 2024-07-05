@@ -1,63 +1,42 @@
 "use server";
 
-import { connectDB } from "@repo/db/connection";
-import { pool } from "@repo/db";
-import { ProblemType } from "@repo/common/types";
-import { QueryResult } from "pg";
+import { PrismaClient, pool } from "@repo/db";
 import { cache } from "react";
-import { formatProblemArrayType } from "../problems/page";
+const prisma = new PrismaClient();
 
 export const getAllProblems = cache(async () => {
-  await connectDB();
   try {
-    const problemsData = (await pool.query(
-      `
-        SELECT
-        p.name,
-        p.id AS problemId,
-        t.id as testcaseId,
-        p.description AS problemDescription,
-        t.description as testcaseDescription,
-        t.solution,
-        p.isactiveforsubmission
-        FROM testcases AS t
-        JOIN problems AS p ON t.problemId = p.id
-        `
-    )) as QueryResult<formatProblemArrayType>;
-    return problemsData?.rows;
+    return await prisma.problem.findMany();
   } catch (error) {
     console.log("ERROR FETCHING ALL PROBLEMS", error);
+  } finally {
+    await prisma.$disconnect();
   }
 });
 
 export const getProblemById = cache(async (problemId: string) => {
-  await connectDB();
   try {
-    const problemsData = (await pool.query(
-      `
-        SELECT * FROM problems WHERE id = $1
-      `,
-      [problemId]
-    )) as QueryResult<ProblemType>;
-
-    const problem = problemsData?.rows[0];
-    return problem;
+    return await prisma.problem.findMany({
+      where: { id: problemId },
+    });
   } catch (error) {
-    console.log("ERROR FETCHING ONE PROBLEM", error);
+    console.log("ERROR FETCHING PROBLEM BY ID", error);
+  } finally {
+    await prisma.$disconnect();
   }
 });
 
-export const getProblemByName = cache(async (name: string) => {
-  await connectDB();
-  try {
-    const problemData = (await pool.query(
-      `
-      SELECT * FROM problems WHERE name = $1
-    `,
-      [name]
-    )) as QueryResult<ProblemType>;
-    return problemData.rows[0];
-  } catch (error) {
-    console.log("ERROR FETCHING PROBLEM BY NAME ", error);
+export const getProblemByNameAndTestcases = cache(
+  async (problemName: string) => {
+    try {
+      return await prisma.problem.findFirst({
+        where: { name: problemName },
+        include: { testcases: true },
+      });
+    } catch (error) {
+      console.log("ERROR FETCHING PROBLEM BY NAME", error);
+    } finally {
+      await prisma.$disconnect();
+    }
   }
-});
+);
