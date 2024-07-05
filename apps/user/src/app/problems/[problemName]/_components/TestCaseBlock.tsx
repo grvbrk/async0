@@ -3,27 +3,29 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Testcase } from "@repo/db";
-import { Check, TriangleAlert, X } from "lucide-react";
+import { Check, LoaderCircle, TriangleAlert, X } from "lucide-react";
 
 export default function TestCaseBlock({
   testcase,
   index,
-  testcaseStatus,
+  problemStatus,
+  isPending,
 }: {
   testcase: Testcase;
   index: number;
-  testcaseStatus: any;
+  problemStatus: any;
+  isPending: boolean;
 }) {
-  console.log("STATUS", testcaseStatus);
+  console.log("STATUS", problemStatus);
   return (
     <Card
       className={`${
-        testcaseStatus
-          ? testcaseStatus.value.status.id === 3
+        problemStatus
+          ? problemStatus.value.status.id === 3
             ? "border border-green-600"
-            : testcaseStatus.value.status.id === 4
+            : problemStatus.value.status.id === 4
               ? "border border-red-600"
-              : testcaseStatus.value.status.id === 5
+              : [5, 6, 7, 8, 9, 10, 11].includes(problemStatus.value.status.id)
                 ? "border border-yellow-600"
                 : ""
           : ""
@@ -32,25 +34,31 @@ export default function TestCaseBlock({
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle
           className={`${
-            testcaseStatus
-              ? testcaseStatus.value.status.id === 3
+            problemStatus
+              ? problemStatus.value.status.id === 3
                 ? "text-green-600"
-                : testcaseStatus.value.status.id === 4
+                : problemStatus.value.status.id === 4
                   ? "text-red-600"
-                  : testcaseStatus.value.status.id === 5
+                  : [5, 6, 7, 8, 9, 10, 11].includes(
+                        problemStatus.value.status.id
+                      )
                     ? "text-yellow-600"
                     : ""
               : ""
           } text-sm font-medium`}
         >
-          testcaseStatus - {index}
+          problemStatus - {index}
         </CardTitle>
-        {testcaseStatus ? (
-          testcaseStatus.value.status.id === 3 ? (
+        {isPending ? (
+          <LoaderCircle className="animate-spin size-5" />
+        ) : problemStatus ? (
+          problemStatus.value.status.id === 3 ? (
             <Check className="text-green-600 size-5" />
-          ) : testcaseStatus.value.status.id === 4 ? (
+          ) : problemStatus.value.status.id === 4 ? (
             <X className="text-red-600 size-5" />
-          ) : testcaseStatus.value.status.id === 5 ? (
+          ) : [5, 6, 7, 8, 9, 10, 11].includes(
+              problemStatus.value.status.id
+            ) ? (
             <TriangleAlert className="text-yellow-600 size-5" />
           ) : null
         ) : null}
@@ -66,8 +74,4 @@ export default function TestCaseBlock({
       </CardContent>
     </Card>
   );
-}
-
-{
-  /* <LoaderCircle /> */
 }
