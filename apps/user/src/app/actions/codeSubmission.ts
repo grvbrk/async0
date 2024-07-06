@@ -1,9 +1,9 @@
 "use server";
 
-import getBatchSubmission from "@/driverCode/Duplicate-Integer";
 import { Difficulty } from "@repo/db";
 import axios from "axios";
 import { cache } from "react";
+import getBatchSubmission from "@repo/common/driver/duplicateinteger";
 
 type DisplayProblemPropType =
   | ({

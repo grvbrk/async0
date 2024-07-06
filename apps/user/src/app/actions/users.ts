@@ -1,7 +1,6 @@
 "use server";
 
-import { connectDB } from "@repo/db/connection";
-import { PrismaClient, pool } from "@repo/db";
+import { PrismaClient } from "@repo/db";
 import { cache } from "react";
 const prisma = new PrismaClient();
 
