@@ -1,9 +1,16 @@
 {
   "name": "@repo/common",
   "version": "1.0.0",
-  "main": "seed-data.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "exports": {
+    "./driver/*": "./src/driver-code/*.ts",
+    "./problem-ui/*": "./src/problem-ui/*.tsx"
+  },
+  "devDependencies": {
+    "@repo/db": "*",
+    "@repo/ui": "*"
   },
   "keywords": [],
   "author": "",
