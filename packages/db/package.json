@@ -1,7 +1,8 @@
 {
   "name": "@repo/db",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
   "scripts": {
     "migrate": "node-pg-migrate",
     "db:generate": "prisma generate",
@@ -12,8 +13,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@prisma/client": "^5.15.1",
+    "@prisma/client": "^5.16.1",
     "pg": "^8.12.0"
+  },
+  "exports": {
+    ".": "./src/index.ts"
   },
   "devDependencies": {
     "@types/node": "^20.14.8",

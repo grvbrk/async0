@@ -1,4 +1,4 @@
-import { pool } from ".";
+import { pool } from "./db";
 
 export async function connectDB() {
   if (!pool._pool) {
