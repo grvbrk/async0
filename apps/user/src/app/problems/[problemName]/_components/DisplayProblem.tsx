@@ -4,23 +4,30 @@ import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-} from "@/components/ui/resizable";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+} from "@repo/ui/components/ui/resizable";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@repo/ui/components/ui/tabs";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@repo/ui/components/ui/card";
+import { Input } from "@repo/ui/components/ui/input";
+import { Label } from "@repo/ui/components/ui/label";
+import { Badge } from "@repo/ui/components/ui/badge";
 import { BookOpen, Code, NotebookText } from "lucide-react";
 import CodeEditor from "../CodeEditor";
 import TestCaseBlock from "./TestCaseBlock";
-import { Difficulty } from "@repo/db";
+import { Difficulty } from "@prisma/client";
 import { useState, useTransition } from "react";
 import { codeSubmission } from "@/app/actions/codeSubmission";
+import ProblemDesc from "@repo/common/problem-ui/DuplicateInteger";
 
 type DisplayProblemPropType =
   | ({
@@ -87,14 +94,23 @@ export default function DisplayProblem({
             </TabsTrigger>
           </TabsList>
           <TabsContent value="problem">
-            <Card className="h-[75vh] overflow-y-auto">
+            <Card className="h-[75vh] overflow-y-auto ">
               {problem ? (
                 <>
                   <CardHeader>
-                    <CardTitle className="pb-2">{problem.name}</CardTitle>
-                    <CardDescription>{/* TBD... */}</CardDescription>
+                    <CardTitle className="flex items-center mb-2">
+                      <div className="text-2xl font-extrabold">
+                        {problem.name}
+                      </div>
+                      <Badge className="text-white bg-green-600 ml-auto">
+                        {problem.difficulty}
+                      </Badge>
+                    </CardTitle>
+                    <CardDescription>
+                      <ProblemDesc />
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-2">
+                  <CardContent>
                     {problem.testcases.map((testcase, index) => {
                       return (
                         <TestCaseBlock

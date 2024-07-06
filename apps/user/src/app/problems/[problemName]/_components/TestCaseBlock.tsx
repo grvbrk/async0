@@ -1,7 +1,7 @@
 "use client";
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Card } from "@repo/ui/components/ui/card";
+import { Separator } from "@repo/ui/components/ui/separator";
 import { Testcase } from "@repo/db";
 import { Check, LoaderCircle, TriangleAlert, X } from "lucide-react";
 
@@ -16,23 +16,22 @@ export default function TestCaseBlock({
   problemStatus: any;
   isPending: boolean;
 }) {
-  console.log("STATUS", problemStatus);
   return (
     <Card
       className={`${
         problemStatus
           ? problemStatus.value.status.id === 3
-            ? "border border-green-600"
+            ? " border-green-600"
             : problemStatus.value.status.id === 4
-              ? "border border-red-600"
+              ? " border-red-600"
               : [5, 6, 7, 8, 9, 10, 11].includes(problemStatus.value.status.id)
-                ? "border border-yellow-600"
+                ? " border-yellow-600"
                 : ""
           : ""
-      }`}
+      } border px-4 py-4 mb-6 font-fira-code text-sm text-muted-foreground`}
     >
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle
+      <div className="flex flex-row items-center justify-between pb-2">
+        <div
           className={`${
             problemStatus
               ? problemStatus.value.status.id === 3
@@ -45,10 +44,10 @@ export default function TestCaseBlock({
                     ? "text-yellow-600"
                     : ""
               : ""
-          } text-sm font-medium`}
+          }`}
         >
           Testcase - {index}
-        </CardTitle>
+        </div>
         {isPending ? (
           <LoaderCircle className="animate-spin size-5" />
         ) : problemStatus ? (
@@ -62,16 +61,12 @@ export default function TestCaseBlock({
             <TriangleAlert className="text-yellow-600 size-5" />
           ) : null
         ) : null}
-      </CardHeader>
-      <Separator className="w-20 mx-6" />
-      <CardContent className="pt-4">
-        <p className="text-xs text-muted-foreground overflow-x-auto whitespace-nowrap">
-          {testcase.input}
-        </p>
-        <p className="text-xs text-muted-foreground overflow-x-auto whitespace-nowrap">
-          {`Output: ${testcase.output}`}
-        </p>
-      </CardContent>
+      </div>
+      <Separator className="mb-2 w-5/6" />
+      <div>
+        <div className="overflow-x-auto ">{testcase.input}</div>
+        <div className="overflow-x-auto ">{`Output: ${testcase.output}`}</div>
+      </div>
     </Card>
   );
 }

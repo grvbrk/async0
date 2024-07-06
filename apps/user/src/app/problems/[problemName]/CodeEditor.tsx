@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@repo/ui/components/ui/button";
+import { Card, CardContent } from "@repo/ui/components/ui/card";
 import Editor, { Monaco } from "@monaco-editor/react";
 import { ChevronUp, Send } from "lucide-react";
 import { editor } from "monaco-editor";
@@ -57,7 +57,7 @@ export default function CodeEditor({
       <div className="p-4 mt-2">
         <Card className="relative ">
           <Editor
-            className="rounded-md overflow-hidden z-10"
+            className="rounded-md overflow-hidden z-0"
             height="75vh"
             theme="vs-dark"
             defaultLanguage="javascript"
@@ -91,7 +91,7 @@ export default function CodeEditor({
             }}
           />
           {showConsole && (
-            <Card className="absolute bottom-0 h-2/5 w-full rounded-md  transition-all duration-400 ease-in-out overflow-y-auto box-border border border-gray-600 bg-grey-900 font-fira-code z-50">
+            <Card className="absolute bottom-0 h-2/5 w-full rounded-md   overflow-y-auto box-border border-y-2 border-gray-600 bg-black font-fira-code z-50 ">
               <CardContent className="mt-4">
                 <ShowResults
                   isPending={isPending}
