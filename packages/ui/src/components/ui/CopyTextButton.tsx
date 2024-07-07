@@ -1,11 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-
 import { Copy, CheckCheck } from "lucide-react";
-import { Button } from "@repo/ui/components/ui/button";
+import { Button } from "./button";
+import { ButtonHTMLAttributes } from "react";
 
-export default function CopyTextButton({ text, ...props }: { text: string }) {
+interface CopyTextButtonProps extends ButtonHTMLAttributes<HTMLDivElement> {
+  text: string;
+}
+export function CopyTextButton({ text, ...props }: CopyTextButtonProps) {
   const [copied, setCopied] = useState<boolean>(false);
 
   function handleClick() {
@@ -19,7 +22,7 @@ export default function CopyTextButton({ text, ...props }: { text: string }) {
       <Button
         onClick={handleClick}
         variant="ghost"
-        className="hover:bg-transparent hover:text-white"
+        className="hover:bg-transparent hover:text-black"
       >
         {copied ? (
           <CheckCheck className="h-4 w-4 bg-none" />

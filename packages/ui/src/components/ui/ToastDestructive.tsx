@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { Button } from "./button";
 import { ToastAction } from "./toast";
 import { useToast } from "./use-toast";
