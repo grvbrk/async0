@@ -6,11 +6,13 @@
   },
   "exports": {
     "./driver/*": "./src/driver-code/*.ts",
-    "./problem-ui/*": "./src/problem-ui/*.tsx"
+    "./problem-ui/*": "./src/problem-ui/*.tsx",
+    ".": "./src/index.ts"
   },
   "devDependencies": {
     "@repo/db": "*",
-    "@repo/ui": "*"
+    "@repo/ui": "*",
+    "tailwindcss": "^3.4.4"
   },
   "keywords": [],
   "author": "",
