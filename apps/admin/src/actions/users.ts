@@ -1,37 +1,29 @@
 "use server";
 
-import { QueryResult } from "pg";
-import { connectDB } from "@repo/db/connection";
-import { pool } from "@repo/db";
-import { UserType } from "@repo/common/types";
 import { cache } from "react";
+import prisma from "@repo/db";
 
 export const findUser = cache(async (email: string) => {
   try {
-    connectDB();
-    const userArray = (await pool.query(
-      `
-        SELECT * FROM users WHERE email = $1
-      `,
-      [email]
-    )) as QueryResult<UserType>;
-    return userArray?.rows[0];
+    return await prisma.user.findUnique({ where: { email: email } });
   } catch (error) {
+    console.log("Error finding user");
     return undefined;
+  } finally {
+    await prisma.$disconnect();
   }
 });
 
 export const addUser = cache(async (email: string) => {
   try {
-    connectDB();
-    await pool.query(
-      `
-      INSERT INTO users (email)
-      VALUES ($1)
-    `,
-      [email]
-    );
+    return await prisma.user.create({
+      data: {
+        email: email,
+      },
+    });
   } catch (error) {
     console.log("Error adding user");
+  } finally {
+    await prisma.$disconnect();
   }
 });

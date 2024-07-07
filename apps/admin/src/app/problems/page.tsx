@@ -1,39 +1,27 @@
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableCell,
-  TableBody,
-} from "@/components/ui/table";
+import Link from "next/link";
+import { getAllProblemsWithTestcases } from "@/actions/problems";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-
-import { Button } from "@/components/ui/button";
+} from "@repo/ui/components/ui/dropdown-menu";
+import {
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+  Table,
+} from "@repo/ui/components/ui/table";
+import { Button } from "@repo/ui/components/ui/button";
 import { CheckCircle2, XCircle, MoreVertical } from "lucide-react";
-import Link from "next/link";
-import { getAllProblems } from "@/actions/problems";
-
-function formatProblemData(problems: any) {
-  return problems.map((problem: any) => {
-    return {
-      id: problem.id,
-      name: problem.name,
-      description: problem.description,
-      isActiveForSubmission: problem.isactiveforsubmission,
-    };
-  });
-}
 
 export default function AdminProblemPage() {
   return (
     <>
-      <div className=" flex justify-between mb-4">
+      <div className="flex justify-between mb-4">
         <div>
           <h3 className="text-lg font-medium">Problem Board</h3>
           <p className="text-sm">
@@ -50,7 +38,7 @@ export default function AdminProblemPage() {
 }
 
 async function ProblemsTable() {
-  const problems = (await getAllProblems()) || [];
+  const problems = (await getAllProblemsWithTestcases()) || [];
 
   return (
     <>
@@ -88,7 +76,7 @@ async function ProblemsTable() {
                   </TableCell>
                   <TableCell>{problem.name}</TableCell>
                   <TableCell>$100</TableCell>
-                  <TableCell>{problems.length}</TableCell>
+                  <TableCell>{problem.testcases.length}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger>

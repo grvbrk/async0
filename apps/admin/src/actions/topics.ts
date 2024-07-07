@@ -1,35 +1,19 @@
-import { NeetcodeTopicType, TopicType } from "@repo/common/types";
-import { pool } from "@repo/db";
-import { connectDB } from "@repo/db/connection";
-import { QueryResult } from "pg";
 import { cache } from "react";
+import prisma from "@repo/db";
 
 export const getAllTopics = cache(async () => {
-  connectDB();
   try {
-    const topicsData = (await pool.query(
-      `
-        SELECT * FROM "Topic"
-      `
-    )) as QueryResult<TopicType>;
-
-    return topicsData?.rows;
+    return await prisma.topic.findMany();
   } catch (error) {
     console.log("ERROR FETCHING ALL TOPICS");
+  } finally {
+    await prisma.$disconnect();
   }
 });
 
-export const getNeetcodeTopics = cache(async () => {
-  connectDB();
-  try {
-    const NeetcodeTopicsData = (await pool.query(
-      `
-        SELECT * FROM neetcodetopics
-      `
-    )) as QueryResult<NeetcodeTopicType>;
-
-    return NeetcodeTopicsData?.rows;
-  } catch (error) {
-    console.log("ERROR FETCHING ALL NEETCODE TOPICS");
-  }
-});
+// export const getNeetcodeTopics = cache(async () => {
+//   try {
+//   } catch (error) {
+//     console.log("ERROR FETCHING ALL NEETCODE TOPICS");
+//   }
+// });

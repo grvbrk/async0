@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button } from "./ui/button";
 import { Copy, CheckCheck } from "lucide-react";
+import { Button } from "@repo/ui/components/ui/button";
 
 export default function CopyTextButton({ text, ...props }: { text: string }) {
   const [copied, setCopied] = useState<boolean>(false);

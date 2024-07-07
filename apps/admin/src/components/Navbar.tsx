@@ -8,20 +8,20 @@ import {
   ClientSafeProvider,
   LiteralUnion,
 } from "next-auth/react";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { CircleUser, LogIn, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { BuiltInProviderType } from "next-auth/providers/index";
 import { useState, useEffect } from "react";
+import { Button } from "@repo/ui/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuItem,
+} from "@repo/ui/components/ui/dropdown-menu";
+import { Input } from "@repo/ui/components/ui/input";
 
 type ProvidersResponse = Record<
   LiteralUnion<BuiltInProviderType, string>,

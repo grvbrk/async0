@@ -1,20 +1,14 @@
-import { ListType } from "@repo/common/types";
-import { pool } from "@repo/db";
-import { connectDB } from "@repo/db/connection";
-import { QueryResult } from "pg";
+"use server";
+
 import { cache } from "react";
+import prisma from "@repo/db";
 
 export const getAllLists = cache(async () => {
-  connectDB();
   try {
-    const listsData = (await pool.query(
-      `
-        SELECT * FROM "List"
-      `
-    )) as QueryResult<ListType>;
-
-    return listsData?.rows;
+    return await prisma.list.findMany();
   } catch (error) {
     console.log("ERROR FETCHING ALL LISTS");
+  } finally {
+    await prisma.$disconnect();
   }
 });

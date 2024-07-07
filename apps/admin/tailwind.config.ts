@@ -3,22 +3,16 @@ import type { Config } from "tailwindcss";
 const config = {
   darkMode: ["class"],
   content: [
-    "./pages/**/*.{ts,tsx,md,mdx}",
-    "./components/**/*.{ts,tsx,md,mdx}",
-    "./app/**/*.{ts,tsx,md,mdx}",
-    "./src/**/*.{ts,tsx,md,mdx}",
-    "./mdx-components.tsx",
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+    "../../packages/ui/**/*{.js,.ts,.jsx,.tsx}",
+    "../../packages/common/**/*{.js,.ts,.jsx,.tsx}",
   ],
   prefix: "",
-  safelist: [
-    {
-      pattern: /hljs+/,
-    },
-  ],
+
   theme: {
-    hljs: {
-      theme: "atom-one-dark",
-    },
     container: {
       center: true,
       padding: "2rem",
@@ -27,7 +21,12 @@ const config = {
       },
     },
     extend: {
+      fontFamily: {
+        "ubuntu-mono": ["var(--font-ubuntu-mono)"],
+        "fira-code": ["var(--font-fira-code)"],
+      },
       colors: {
+        golden: "	#bf9b30",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -83,7 +82,7 @@ const config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate"), require("tailwind-highlightjs")],
+  plugins: [require("tailwindcss-animate")],
 } satisfies Config;
 
 export default config;

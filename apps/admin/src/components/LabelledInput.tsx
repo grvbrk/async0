@@ -1,5 +1,5 @@
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
+import { Input } from "@repo/ui/components/ui/input";
+import { Label } from "@repo/ui/components/ui/label";
 
 export default function LabelledInput({
   children,

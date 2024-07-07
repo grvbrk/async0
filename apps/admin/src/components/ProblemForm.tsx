@@ -1,73 +1,101 @@
 "use client";
 
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useFormState, useFormStatus } from "react-dom";
+import { ButtonHTMLAttributes, useState } from "react";
+import { addOneProblem, updateOneProblem } from "@/actions/handleFormData";
+import { DIFFICULTY } from "@/lib/constant";
+import { X, CirclePlus } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { Button } from "@repo/ui/components/ui/button";
+import { Label } from "@repo/ui/components/ui/label";
 import {
   Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useFormStatus } from "react-dom";
-import { ButtonHTMLAttributes, useState } from "react";
-import { handleProblemFormData } from "@/actions/handleFormData";
-import { ListType, TopicType } from "@repo/common/types";
-import { DIFFICULTY } from "@/lib/constant";
+  SelectContent,
+  SelectItem,
+} from "@repo/ui/components/ui/select";
+import { Input } from "@repo/ui/components/ui/input";
+import { List, Problem, Topic } from "@repo/db";
+import { toast } from "sonner";
+import { Testcase } from "@repo/db";
+import { Textarea } from "@repo/ui/components/ui/textarea";
+import { deleteOneProblem, updateProblem } from "@/actions/problems";
 
-type TestCase = {
-  input: string;
-  output: string;
+type ProblemFormType = {
+  problem?: {
+    List: List[];
+    topics: Topic[];
+    testcases: Testcase[];
+  } & Problem;
+  lists?: List[];
+  topics?: Topic[];
 };
 
-// type TestCaseField = keyof TestCase;
+export default function ProblemForm({
+  problem,
+  lists,
+  topics,
+}: ProblemFormType) {
+  const { data: session } = useSession();
+  const [error, action] = useFormState(
+    problem ? updateOneProblem.bind(null, problem.id) : addOneProblem,
+    {}
+  );
 
-type AddProblemPropsType = {
-  lists: ListType[] | undefined;
-  topics: TopicType[] | undefined;
-};
+  const [testCases, setTestCases] = useState<Partial<Testcase>[]>(
+    problem?.testcases.map((tc) => ({
+      input: tc.input,
+      output: tc.output,
+    })) || [{ input: "", output: "" }]
+  );
+  const [selectedLevel, setSelectedLevel] = useState<string>(
+    problem?.difficulty || ""
+  );
+  const [selectedList, setSelectedList] = useState<string>(
+    problem?.List[0]?.name || ""
+  );
+  const [selectedTopic, setSelectedTopic] = useState<string>(
+    problem?.topics[0].name || ""
+  );
 
-export default function AddProblemForm({ lists, topics }: AddProblemPropsType) {
-  // const [testCases, setTestCases] = useState<TestCase[]>([
-  //   { input: "", output: "" },
-  // ]);
+  function handleTestCaseChange(
+    idx: number,
+    field: keyof Testcase,
+    value: string
+  ) {
+    const updatedTestCases = [...testCases];
+    updatedTestCases[idx][field] = value;
+    setTestCases(updatedTestCases);
+  }
 
-  const [selectedLevel, setSelectedLevel] = useState<string>("");
-  const [selectedList, setSelectedList] = useState<string>("");
-  const [selectedTopic, setSelectedTopic] = useState<string>("");
+  function addTestCase() {
+    setTestCases([...testCases, { input: "", output: "" }]);
+  }
 
-  // function handleTestCaseChange(
-  //   idx: number,
-  //   field: TestCaseField,
-  //   value: string
-  // ) {
-  //   const updatedTestCases = [...testCases];
-  //   updatedTestCases[idx][field] = value;
-  //   setTestCases(updatedTestCases);
-  // }
-
-  // function addTestCase() {
-  //   setTestCases([...testCases, { input: "", output: "" }]);
-  // }
-
-  // function removeTestCase(idx: number) {
-  //   setTestCases(testCases.filter((_, i) => i !== idx));
-  // }
+  function removeTestCase(idx: number) {
+    setTestCases(testCases.filter((_, i) => i !== idx));
+  }
 
   return (
-    <form action={handleProblemFormData}>
+    <form action={action}>
       <div className="flex items-end gap-4 mb-2 md:flex md:items-end">
         <div className="md:w-full md:min-w-[100px]">
           <Label htmlFor="name">Problem Name</Label>
-          <Input type="text" id="name" name="name" required />
+          <Input
+            type="text"
+            id="name"
+            name="name"
+            defaultValue={problem?.name || ""}
+            required
+          />
         </div>
       </div>
       <div className="flex justify-between gap-4 md:justify-start">
         <Select onValueChange={setSelectedList} value={selectedList}>
           <SelectTrigger
             className="w-[180px]"
-            disabled={lists?.length ? false : true}
+            disabled={!lists || lists.length === 0}
           >
             <SelectValue placeholder="List" />
           </SelectTrigger>
@@ -114,12 +142,20 @@ export default function AddProblemForm({ lists, topics }: AddProblemPropsType) {
           </SelectContent>
         </Select>
       </div>
-      {/* <div className="space-y-2">
-        <Label htmlFor="description">Problem Description</Label>
-        <Textarea id="description" name="description" required rows={8} />
-      </div> */}
 
-      {/* <div className="space-y-2">
+      <div className="space-y-2 mt-5">
+        <Label htmlFor="placeholderCode">Placeholder Code</Label>
+        <Textarea
+          id="placeholderCode"
+          name="placeholderCode"
+          placeholder="starter code..."
+          defaultValue={problem?.starterCode || ""}
+          rows={4}
+          required
+        />
+      </div>
+
+      <div className="space-y-2 mt-5">
         <Label htmlFor="Description">Testcases</Label>
         {testCases.map((testcase, idx) => {
           return (
@@ -171,12 +207,34 @@ export default function AddProblemForm({ lists, topics }: AddProblemPropsType) {
           <CirclePlus className="mr-2" />
           Add Testcase
         </Button>
-      </div> */}
+      </div>
 
-      <SubmitButton className="mt-6" />
+      <SubmitButton
+        className="mt-6"
+        onClick={(e) => {
+          if (!session) {
+            toast.error("You need to login first");
+            e.preventDefault();
+          }
+        }}
+      />
+
+      {problem && (
+        <DeleteButton
+          className="ml-4"
+          onClick={async (e) => {
+            if (!session) {
+              toast.error("You need to login first");
+              e.preventDefault();
+            }
+            await deleteOneProblem(problem?.id || "");
+          }}
+        />
+      )}
+
       <input type="hidden" name="difficulty" value={selectedLevel} />
       <input type="hidden" name="list" value={selectedList} />
-      <input type="hidden" name="topics" value={selectedTopic} />
+      <input type="hidden" name="topic" value={selectedTopic} />
     </form>
   );
 }
@@ -187,6 +245,16 @@ function SubmitButton(props: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <Button type="submit" disabled={pending} {...props}>
       {pending ? "Saving..." : "Save"}
+    </Button>
+  );
+}
+
+function DeleteButton(props: ButtonHTMLAttributes<HTMLButtonElement>) {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button disabled={pending} variant="destructive" {...props}>
+      {pending ? "Deleting..." : "Delete"}
     </Button>
   );
 }
