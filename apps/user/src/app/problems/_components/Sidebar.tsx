@@ -6,20 +6,19 @@ import {
   SheetDescription,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
+} from "@repo/ui/components/ui/sheet";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Progress } from "@/components/ui/progress";
+} from "@repo/ui/components/ui/accordion";
+import { Progress } from "@repo/ui/components/ui/progress";
 import { AlignJustify } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { TopicType } from "@repo/common/types";
 import Link from "next/link";
 
-function Sidebar({ topics }: { topics: TopicType[] }) {
+function Sidebar({ topics }: { topics: any[] }) {
   const { data: session } = useSession();
 
   return (

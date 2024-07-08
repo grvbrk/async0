@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,11 +7,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@repo/ui/components/ui/dropdown-menu";
 import Sidebar from "./Sidebar";
 import Link from "next/link";
 import { CircleUser, LogIn, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Input } from "@repo/ui/components/ui/input";
 import {
   ClientSafeProvider,
   LiteralUnion,
@@ -22,14 +22,13 @@ import {
 } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { BuiltInProviderType } from "next-auth/providers/index";
-import { TopicType } from "@repo/common/types";
 
 type ProvidersResponse = Record<
   LiteralUnion<BuiltInProviderType, string>,
   ClientSafeProvider
 >;
 
-export default function ProblemNavbar({ topics }: { topics: TopicType[] }) {
+export default function ProblemNavbar({ topics }: { topics: any }) {
   const { data: session } = useSession();
   const [providers, setProviders] = useState<ProvidersResponse | null>(null);
 
