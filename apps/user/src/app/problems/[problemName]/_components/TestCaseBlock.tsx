@@ -31,7 +31,7 @@ export default function TestCaseBlock({
       } border px-4 py-4 mb-6 font-fira-code text-sm text-muted-foreground`}
     >
       <div className="flex flex-row items-center justify-between pb-2">
-        <div
+        <code
           className={`${
             problemStatus
               ? problemStatus.value.status.id === 3
@@ -47,7 +47,7 @@ export default function TestCaseBlock({
           }`}
         >
           Testcase - {index}
-        </div>
+        </code>
         {isPending ? (
           <LoaderCircle className="animate-spin size-5" />
         ) : problemStatus ? (
@@ -64,8 +64,9 @@ export default function TestCaseBlock({
       </div>
       <Separator className="mb-2 w-5/6" />
       <div>
-        <div className="overflow-x-auto ">{testcase.input}</div>
-        <div className="overflow-x-auto ">{`Output: ${testcase.output}`}</div>
+        <code className="overflow-x-auto ">{testcase.input}</code>
+        <br />
+        <code className="overflow-x-auto ">{`Output: ${testcase.output}`}</code>
       </div>
     </Card>
   );

@@ -5,6 +5,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@repo/ui/components/ui/resizable";
+
 import {
   Tabs,
   TabsContent,
@@ -22,12 +23,12 @@ import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import { Badge } from "@repo/ui/components/ui/badge";
 import { BookOpen, Code, NotebookText } from "lucide-react";
-import CodeEditor from "../CodeEditor";
+import CodeEditor from "./CodeEditor";
 import TestCaseBlock from "./TestCaseBlock";
 import { Difficulty } from "@prisma/client";
-import { useState, useTransition } from "react";
+import { createElement, useState, useTransition } from "react";
 import { codeSubmission } from "@/app/actions/codeSubmission";
-import ProblemDesc from "@repo/common/problem-ui/DuplicateInteger";
+import { problemComponents, unescapeCode } from "@repo/common";
 
 type DisplayProblemPropType =
   | ({
@@ -51,29 +52,39 @@ type DisplayProblemPropType =
 
 export default function DisplayProblem({
   problem,
+  problemName,
 }: {
   problem: DisplayProblemPropType;
+  problemName: string;
 }) {
   const [problemStatus, setProblemStatus] = useState<unknown[] | undefined>([]);
-  const [placeholderCode, setPlaceholderCode] = useState<string>(
-    "function hasDuplicate(nums){\n\t// todo\n};"
-  );
-
   const [isPending, startTransition] = useTransition();
 
   async function handleTestcaseSubmission(code: string) {
-    setPlaceholderCode(code);
     startTransition(async () => {
-      const response = await codeSubmission(code, problem);
-      setProblemStatus(response);
+      // response variable gets the final result from judge0
+      const response = await codeSubmission(code, problem, problemName);
+      if (response) {
+        const firstErrorIndex = response.findIndex((problem: any) =>
+          [4, 5, 6, 7, 8, 9, 10, 11, 12].includes(problem.value.status.id)
+        );
+        const problemsToShow =
+          firstErrorIndex !== -1
+            ? response.slice(0, firstErrorIndex + 1)
+            : response;
+        setProblemStatus(problemsToShow);
+      }
     });
   }
 
   return (
-    <ResizablePanelGroup direction="horizontal" className="grid grid-cols-2">
+    <ResizablePanelGroup
+      direction="horizontal"
+      className="md:px-5 grid grid-cols-2 "
+    >
       <ResizablePanel defaultSize={45} minSize={25}>
-        <Tabs defaultValue="problem" className="p-4">
-          <TabsList className="flex justify-around w-full bg-transparent">
+        <Tabs defaultValue="problem" className="p-4 ">
+          <TabsList className="flex justify-around w-full bg-transparent ">
             <TabsTrigger
               value="problem"
               className="w-full data-[state=active]:bg-muted"
@@ -98,7 +109,7 @@ export default function DisplayProblem({
               {problem ? (
                 <>
                   <CardHeader>
-                    <CardTitle className="flex items-center mb-2">
+                    <CardTitle className="flex items-center mb-2 ">
                       <div className="text-2xl font-extrabold">
                         {problem.name}
                       </div>
@@ -107,7 +118,11 @@ export default function DisplayProblem({
                       </Badge>
                     </CardTitle>
                     <CardDescription>
-                      <ProblemDesc />
+                      {problemComponents[problem.name] ? (
+                        createElement(problemComponents[problem.name])
+                      ) : (
+                        <h1>No description found</h1>
+                      )}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -172,10 +187,9 @@ export default function DisplayProblem({
         </Tabs>
       </ResizablePanel>
       <ResizableHandle className="hidden md:block w-1 bg-muted hover:bg-muted-foreground -z-10" />
-      <ResizablePanel minSize={20} defaultSize={45} className="hidden md:block">
-        <div className="h-9"></div>
+      <ResizablePanel minSize={20} defaultSize={55} className="hidden md:block">
         <CodeEditor
-          placeholderCode={placeholderCode}
+          placeholderCode={unescapeCode(problem?.starterCode || "") || ""}
           handleTestcaseSubmission={handleTestcaseSubmission}
           isPending={isPending}
           problemStatus={problemStatus}

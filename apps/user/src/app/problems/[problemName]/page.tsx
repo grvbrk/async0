@@ -13,7 +13,10 @@ export default async function page({
 
   return (
     <>
-      <DisplayProblem problem={problem} />
+      <DisplayProblem
+        problem={problem}
+        problemName={problemName.toLowerCase().replace(/[^a-z0-9]/g, "")}
+      />
     </>
   );
 }
