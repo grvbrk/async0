@@ -1,8 +1,7 @@
 "use server";
 
-import { PrismaClient } from "@repo/db";
 import { cache } from "react";
-const prisma = new PrismaClient();
+import prisma from "@repo/db";
 
 export const findUser = cache(async (email: string) => {
   try {

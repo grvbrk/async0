@@ -1,12 +1,11 @@
 "use server";
 
-import { PrismaClient } from "@repo/db";
 import { cache } from "react";
-const prisma = new PrismaClient();
+import prisma from "@repo/db";
 
 export const findAllProblemsForUser = cache(async (user: any) => {
   try {
-    return await await prisma.problem.findMany({
+    return await prisma.problem.findMany({
       select: {
         id: true,
         name: true,
@@ -16,6 +15,7 @@ export const findAllProblemsForUser = cache(async (user: any) => {
             name: true,
           },
         },
+        List: true,
         hasUserSolved: {
           where: { userId: user.id },
           select: {
