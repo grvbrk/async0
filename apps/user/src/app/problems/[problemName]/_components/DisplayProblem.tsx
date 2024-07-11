@@ -57,26 +57,31 @@ export default function DisplayProblem({
   problem: DisplayProblemPropType;
   problemName: string;
 }) {
-  const [problemStatus, setProblemStatus] = useState<unknown[] | undefined>([]);
+  const [problemSubmitStatus, setProblemSubmitStatus] = useState<any>([]);
+  const [problemRunStatus, setProblemRunStatus] = useState<any>({});
+  const [errorIndex, setErrorIndex] = useState<number>(0);
   const [isPending, startTransition] = useTransition();
 
-  async function handleTestcaseSubmission(code: string) {
+  async function handleTestcaseSubmission(code: string, run: boolean) {
     startTransition(async () => {
       // response variable gets the final result from judge0
-      const response = await codeSubmission(code, problem, problemName);
-      if (response) {
+      const response = await codeSubmission(code, problem, problemName, run);
+      // console.log("RESPONSE", response);
+      if (response && Array.isArray(response)) {
         const firstErrorIndex = response.findIndex((problem: any) =>
           [4, 5, 6, 7, 8, 9, 10, 11, 12].includes(problem.value.status.id)
         );
+        setErrorIndex(firstErrorIndex);
         const problemsToShow =
           firstErrorIndex !== -1
             ? response.slice(0, firstErrorIndex + 1)
             : response;
-        setProblemStatus(problemsToShow);
+        setProblemSubmitStatus(problemsToShow);
+      } else {
+        setProblemRunStatus(response);
       }
     });
   }
-
   return (
     <ResizablePanelGroup
       direction="horizontal"
@@ -132,7 +137,7 @@ export default function DisplayProblem({
                           key={testcase.id}
                           testcase={testcase}
                           index={index + 1}
-                          problemStatus={problemStatus?.[index]}
+                          problemSubmitStatus={problemSubmitStatus?.[index]}
                           isPending={isPending}
                         />
                       );
@@ -192,7 +197,12 @@ export default function DisplayProblem({
           placeholderCode={unescapeCode(problem?.starterCode || "") || ""}
           handleTestcaseSubmission={handleTestcaseSubmission}
           isPending={isPending}
-          problemStatus={problemStatus}
+          problemSubmitStatus={problemSubmitStatus}
+          setProblemSubmitStatus={setProblemSubmitStatus}
+          problemRunStatus={problemRunStatus}
+          setProblemRunStatus={setProblemRunStatus}
+          totaltestcases={problem?.testcases.length as number}
+          passedtestcases={errorIndex}
         />
       </ResizablePanel>
     </ResizablePanelGroup>

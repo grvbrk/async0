@@ -17,11 +17,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+} from "@repo/ui/components/ui/table";
+import { Button } from "@repo/ui/components/ui/button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ProblemType } from "@repo/common/types";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -46,8 +45,9 @@ export function DataTable<TData, TValue>({
   });
   const router = useRouter();
 
-  function handleRowClick(problemId: string) {
-    router.push(`/problems/${problemId}`);
+  function handleRowClick(problemName: string) {
+    problemName = problemName.split(" ").join("-");
+    router.push(`/problems/${problemName}`);
   }
   return (
     <>
@@ -58,7 +58,7 @@ export function DataTable<TData, TValue>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} className="px-4">
+                    <TableHead key={header.id} className="px-4 ">
                       {flexRender(
                         header.column.columnDef.header,
                         header.getContext()

@@ -2,21 +2,43 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, Check, Code, X } from "lucide-react";
-import { TestcaseType } from "@repo/common/types";
-import { problemDataType } from "./page";
+import { Difficulty, List, Status } from "@repo/db";
+import { Badge } from "@repo/ui/components/ui/badge";
 
-export const columns: ColumnDef<problemDataType>[] = [
+type userProblemDetails = {
+  id: string;
+  name: string;
+  difficulty: Difficulty;
+  topics: {
+    name: string;
+  }[];
+  hasUserSolved: {
+    Submission: {
+      status: Status;
+      passedTestcases: number;
+      totalTestcases: number;
+    } | null;
+  }[];
+};
+
+export const columns: ColumnDef<userProblemDetails>[] = [
   {
-    accessorKey: "status",
-    header: "status",
-    cell: (props) => {
-      const status = props.getValue();
+    accessorKey: "hasUserSolved",
+    header: "Status",
+    cell: ({ row }) => {
+      const hasUserSolved = row.getValue("hasUserSolved") as {
+        Submission: {
+          status: Status;
+          passedTestcases: number;
+          totalTestcases: number;
+        };
+      };
+      const isSolved = hasUserSolved?.Submission?.status === "Accepted";
+
       return (
         <div className="flex justify-start pl-2">
-          {status === "AC" ? (
+          {isSolved ? (
             <Check className="text-green-600" />
-          ) : status === "NA" ? (
-            <X className="text-red-600" />
           ) : (
             <Code className="text-muted-foreground size-5" />
           )}
@@ -39,23 +61,36 @@ export const columns: ColumnDef<problemDataType>[] = [
         </div>
       );
     },
-    cell: (props) => {
-      const problem = props.getValue() as string;
-      return <h1 className="text-muted-foreground">{problem}</h1>;
+  },
+  {
+    accessorKey: "difficulty",
+    header: "Difficulty",
+    cell: ({ row }) => {
+      const difficulty = row.getValue("difficulty") as Difficulty;
+      return (
+        <Badge
+          className={`${difficulty === "Easy" ? "text-white bg-green-600" : difficulty === "Medium" ? "text-white bg-yellow-600" : "text-white bg-red-600"}`}
+        >
+          {row.getValue("difficulty")}
+        </Badge>
+      );
+    },
+  },
+
+  {
+    accessorKey: "topics",
+    header: "Topic",
+    cell: ({ row }) => {
+      const topics = row.getValue("topics") as [{ name: string }];
+      return topics[0].name;
     },
   },
   {
-    accessorKey: "testcases",
-    header: () => <div className="flex justify-center">Testcases Passed</div>,
-    cell: (props) => {
-      const testcase = props.getValue() as TestcaseType[];
-      let testcasesPassed = 0;
-      testcase.forEach((t) => {
-        if (t.status === "pass") testcasesPassed += 1;
-      });
-      return (
-        <div className="flex justify-center text-muted-foreground">{`${testcasesPassed}/${testcase.length}`}</div>
-      );
+    accessorKey: "List",
+    header: "List",
+    cell: ({ row }) => {
+      const list = row.getValue("List") as [List];
+      return list[0].name;
     },
   },
 ];

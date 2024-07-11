@@ -8,23 +8,25 @@ import { Check, LoaderCircle, TriangleAlert, X } from "lucide-react";
 export default function TestCaseBlock({
   testcase,
   index,
-  problemStatus,
+  problemSubmitStatus,
   isPending,
 }: {
   testcase: Testcase;
   index: number;
-  problemStatus: any;
+  problemSubmitStatus: any;
   isPending: boolean;
 }) {
   return (
     <Card
       className={`${
-        problemStatus
-          ? problemStatus.value.status.id === 3
+        problemSubmitStatus
+          ? problemSubmitStatus.value.status.id === 3
             ? " border-green-600"
-            : problemStatus.value.status.id === 4
+            : problemSubmitStatus.value.status.id === 4
               ? " border-red-600"
-              : [5, 6, 7, 8, 9, 10, 11].includes(problemStatus.value.status.id)
+              : [5, 6, 7, 8, 9, 10, 11].includes(
+                    problemSubmitStatus.value.status.id
+                  )
                 ? " border-yellow-600"
                 : ""
           : ""
@@ -33,13 +35,13 @@ export default function TestCaseBlock({
       <div className="flex flex-row items-center justify-between pb-2">
         <code
           className={`${
-            problemStatus
-              ? problemStatus.value.status.id === 3
+            problemSubmitStatus
+              ? problemSubmitStatus.value.status.id === 3
                 ? "text-green-600"
-                : problemStatus.value.status.id === 4
+                : problemSubmitStatus.value.status.id === 4
                   ? "text-red-600"
                   : [5, 6, 7, 8, 9, 10, 11].includes(
-                        problemStatus.value.status.id
+                        problemSubmitStatus.value.status.id
                       )
                     ? "text-yellow-600"
                     : ""
@@ -50,13 +52,13 @@ export default function TestCaseBlock({
         </code>
         {isPending ? (
           <LoaderCircle className="animate-spin size-5" />
-        ) : problemStatus ? (
-          problemStatus.value.status.id === 3 ? (
+        ) : problemSubmitStatus ? (
+          problemSubmitStatus.value.status.id === 3 ? (
             <Check className="text-green-600 size-5" />
-          ) : problemStatus.value.status.id === 4 ? (
+          ) : problemSubmitStatus.value.status.id === 4 ? (
             <X className="text-red-600 size-5" />
           ) : [5, 6, 7, 8, 9, 10, 11].includes(
-              problemStatus.value.status.id
+              problemSubmitStatus.value.status.id
             ) ? (
             <TriangleAlert className="text-yellow-600 size-5" />
           ) : null
