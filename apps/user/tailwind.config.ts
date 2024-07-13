@@ -8,8 +8,10 @@ const config = {
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
     "../../packages/ui/**/*{.js,.ts,.jsx,.tsx}",
+    "../../packages/common/**/*{.js,.ts,.jsx,.tsx}",
   ],
   prefix: "",
+
   theme: {
     container: {
       center: true,
@@ -19,6 +21,16 @@ const config = {
       },
     },
     extend: {
+      dropShadow: {
+        glow: [
+          "0 0px 20px rgba(255,255, 255, 0.35)",
+          "0 0px 65px rgba(255, 255,255, 0.2)",
+        ],
+      },
+      fontFamily: {
+        "ubuntu-mono": ["var(--font-ubuntu-mono)"],
+        "fira-code": ["var(--font-fira-code)"],
+      },
       colors: {
         golden: "	#bf9b30",
         border: "hsl(var(--border))",
