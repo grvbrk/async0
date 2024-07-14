@@ -23,6 +23,8 @@ import {
 import { Switch } from "@repo/ui/components/ui/switch";
 import { Tabs, TabsList } from "@repo/ui/components/ui/tabs";
 import Counter from "./Counter";
+import { AnimatePresence, motion } from "framer-motion";
+import { useTheme } from "next-themes";
 
 type CodeEditorPropsType = {
   placeholderCode: string;
@@ -74,6 +76,7 @@ export default function CodeEditor({
       inherit: true,
       rules: [],
       colors: {
+        "editor.background": "#080c16",
         "editor.lineHighlightBackground": "#252526",
         "editorLineNumber.activeForeground": "#FFD700",
       },
@@ -105,9 +108,11 @@ export default function CodeEditor({
   }
 
   function toggleConsole() {
-    setShowConsole(!showConsole);
     if (showConsole) {
-      setShowMessages(false);
+      setShowConsole(false);
+      setTimeout(() => setShowMessages(false), 300);
+    } else {
+      setShowConsole(true);
     }
   }
 
@@ -200,9 +205,9 @@ export default function CodeEditor({
             </div>
           </TabsList>
         </Tabs>
-        <Card className="relative ">
+        <Card className="relative">
           <Editor
-            className="rounded-md overflow-hidden z-0"
+            className=" rounded-xl overflow-hidden z-0"
             height="75vh"
             theme="custom"
             defaultLanguage="javascript"
@@ -253,21 +258,35 @@ export default function CodeEditor({
               },
             }}
           />
-          {showConsole && (
-            <Card className="absolute bottom-0 h-2/5 w-full rounded-md   overflow-y-auto box-border border-y-2 border-gray-600 bg-black font-ubuntu-mono text-lg leading-tight z-50 ">
-              <CardContent className="mt-4">
-                <ShowResults
-                  isPending={isPending}
-                  problemSubmitStatus={problemSubmitStatus}
-                  problemRunStatus={problemRunStatus}
-                  showMessages={showMessages}
-                  showRunData={showRunData}
-                  totaltestcases={totaltestcases}
-                  passedtestcases={passedtestcases}
-                />
-              </CardContent>
-            </Card>
-          )}
+          <AnimatePresence>
+            {showConsole && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "100%", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{
+                  type: "tween",
+                  duration: 0.5,
+                  ease: [0.4, 0.0, 0.2, 1],
+                }}
+                className="absolute bottom-0 w-full z-50"
+              >
+                <Card className="absolute bottom-0 h-2/5 w-full rounded-md overflow-y-auto border-y-2 border-gray-600 bg-black font-ubuntu-mono text-lg leading-tight z-50 ">
+                  <CardContent className="mt-4">
+                    <ShowResults
+                      isPending={isPending}
+                      problemSubmitStatus={problemSubmitStatus}
+                      problemRunStatus={problemRunStatus}
+                      showMessages={showMessages}
+                      showRunData={showRunData}
+                      totaltestcases={totaltestcases}
+                      passedtestcases={passedtestcases}
+                    />
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </Card>
         <div className="flex justify-end gap-2 mt-2">
           <Button size="lg" className="mr-auto" onClick={toggleConsole}>
@@ -280,7 +299,7 @@ export default function CodeEditor({
           <Button
             variant="outline"
             size="lg"
-            className="border border-black"
+            className="border-primary"
             type="submit"
             onClick={handleRun}
             disabled={isPending}
@@ -380,7 +399,7 @@ function ShowResults({
           })
         )}
       </div>
-      {!isPending && !showRunData && (
+      {!isPending && !showRunData && !showMessages && (
         <div
           className={`${passedtestcases === totaltestcases ? "text-green-400" : passedtestcases === 0 ? "text-red-500" : "text-yellow-600 "} font-bold text-md`}
         >{`Testcases passed: ${passedtestcases}/${totaltestcases}`}</div>
@@ -390,7 +409,6 @@ function ShowResults({
 }
 
 function ShowRunConsole(problem: any) {
-  console.log(problem);
   return (
     <>
       <pre className="text-sm text-muted-foreground mt-2 text-wrap">

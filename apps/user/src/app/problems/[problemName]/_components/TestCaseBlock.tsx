@@ -1,9 +1,11 @@
 "use client";
 
+import React from "react";
 import { Card } from "@repo/ui/components/ui/card";
 import { Separator } from "@repo/ui/components/ui/separator";
 import { Testcase } from "@repo/db";
 import { Check, LoaderCircle, TriangleAlert, X } from "lucide-react";
+import { unescapeCode } from "@repo/common";
 
 export default function TestCaseBlock({
   testcase,
@@ -30,7 +32,7 @@ export default function TestCaseBlock({
                 ? " border-yellow-600"
                 : ""
           : ""
-      } border px-4 py-4 mb-6 font-fira-code text-sm text-muted-foreground`}
+      } border px-4 py-4 mb-6 font-fira-code text-sm text-muted-foreground overflow-x-auto text-nowrap`}
     >
       <div className="flex flex-row items-center justify-between pb-2">
         <code
@@ -66,9 +68,12 @@ export default function TestCaseBlock({
       </div>
       <Separator className="mb-2 w-5/6" />
       <div>
-        <code className="overflow-x-auto ">{testcase.input}</code>
-        <br />
-        <code className="overflow-x-auto ">{`Output: ${testcase.output}`}</code>
+        <pre className="overflow-x-auto ">
+          <code>{unescapeCode(testcase.input)}</code>
+        </pre>
+        <pre className="overflow-x-auto ">
+          {`Output: ${unescapeCode(testcase.output)}`}
+        </pre>
       </div>
     </Card>
   );

@@ -6,32 +6,24 @@ import {
   ResizablePanelGroup,
 } from "@repo/ui/components/ui/resizable";
 
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@repo/ui/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/ui/tabs";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/ui/card";
-import { Input } from "@repo/ui/components/ui/input";
-import { Label } from "@repo/ui/components/ui/label";
-import { Badge } from "@repo/ui/components/ui/badge";
 import { BookOpen, Code, NotebookText } from "lucide-react";
 import CodeEditor from "./CodeEditor";
-import TestCaseBlock from "./TestCaseBlock";
 import { Difficulty } from "@prisma/client";
-import { createElement, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { codeSubmission } from "@/app/actions/codeSubmission";
-import { problemComponents, unescapeCode } from "@repo/common";
+import { unescapeCode } from "@repo/common";
 import AnimatePanel from "./AnimatePanel";
+import ProblemInfoCard from "./ProblemInfoCard";
+import ProblemSolutionCard from "./ProblemSolutionCard";
 
-type DisplayProblemPropType =
+export type DisplayProblemPropType =
   | ({
       testcases: {
         id: string;
@@ -133,66 +125,15 @@ export default function DisplayProblem({
               <NotebookText />
             </TabsTrigger>
           </TabsList>
-          <AnimatePanel direction={direction}>
+          <AnimatePanel direction={direction} activeTab={activeTab}>
             {activeTab === "problem" ? (
-              <Card className="h-[75vh] overflow-y-auto ">
-                {problem ? (
-                  <>
-                    <CardHeader>
-                      <CardTitle className="flex items-center mb-2 ">
-                        <div className="text-2xl font-extrabold">
-                          {problem.name}
-                        </div>
-                        <Badge className="text-white bg-green-600 ml-auto">
-                          {problem.difficulty}
-                        </Badge>
-                      </CardTitle>
-                      <CardDescription>
-                        {problemComponents[problem.name] ? (
-                          createElement(problemComponents[problem.name])
-                        ) : (
-                          <h1>No description found</h1>
-                        )}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      {problem.testcases.map((testcase, index) => {
-                        return (
-                          <TestCaseBlock
-                            key={testcase.id}
-                            testcase={testcase}
-                            index={index + 1}
-                            problemSubmitStatus={problemSubmitStatus?.[index]}
-                            isPending={isPending}
-                          />
-                        );
-                      })}
-                    </CardContent>
-                  </>
-                ) : (
-                  <h1>No problem Found</h1>
-                )}
-              </Card>
+              <ProblemInfoCard
+                problem={problem!}
+                isPending={isPending}
+                problemSubmitStatus={problemSubmitStatus}
+              />
             ) : activeTab === "solution" ? (
-              <Card className="h-[75vh] overflow-y-auto ">
-                <CardHeader>
-                  <CardTitle>Password</CardTitle>
-                  <CardDescription>
-                    Change your password here. After saving, you'll be logged
-                    out.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="space-y-1">
-                    <Label htmlFor="current">Current password</Label>
-                    <Input id="current" type="password" />
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="new">New password</Label>
-                    <Input id="new" type="password" />
-                  </div>
-                </CardContent>
-              </Card>
+              <ProblemSolutionCard problem={problem!} />
             ) : (
               <Card className="h-[75vh] overflow-y-auto">
                 <CardHeader>

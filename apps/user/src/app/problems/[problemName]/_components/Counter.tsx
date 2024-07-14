@@ -30,7 +30,7 @@ export default function Counter({
       <Button
         size={"icon"}
         variant="secondary"
-        className="h-[20px] w-[20px] rounded-full hover:bg-primary hover:text-white p-1"
+        className="h-[20px] w-[20px] rounded-full hover:bg-primary hover:text-background p-1"
         onClick={increaseCount}
         disabled={value >= 50}
       >
@@ -40,7 +40,7 @@ export default function Counter({
       <Button
         size={"icon"}
         variant="secondary"
-        className="h-[20px] w-[20px] rounded-full hover:bg-primary hover:text-white p-1"
+        className="h-[20px] w-[20px] rounded-full hover:bg-primary hover:text-background p-1"
         onClick={decreaseCount}
         disabled={value <= 0}
       >
