@@ -4,7 +4,6 @@ import {
   Sheet,
   SheetContent,
   SheetDescription,
-  SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@repo/ui/components/ui/sheet";
@@ -15,20 +14,21 @@ import {
   AccordionTrigger,
 } from "@repo/ui/components/ui/accordion";
 import { Progress } from "@repo/ui/components/ui/progress";
-import { AlignJustify, Binary, CodeXml } from "lucide-react";
+import { AlignJustify, Binary, CodeXml, ExternalLink } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Problem } from "@repo/db";
 import { useState } from "react";
 import { getSidebarData } from "@/app/actions/topics";
+import { usePathname } from "next/navigation";
 
 function Sidebar() {
   const { data: session } = useSession();
+  const pathname = usePathname();
   const [sidebarData, setSidebarData] = useState<any>([]);
 
   async function handleSidebarClick() {
     const data = await getSidebarData();
-    console.log(data);
     setSidebarData(data);
   }
 
@@ -38,16 +38,16 @@ function Sidebar() {
         <AlignJustify className="h-6 w-6" />
       </SheetTrigger>
       {sidebarData && (
-        <SheetContent side="left" className="h-full">
-          <div className=" w-full px-6 pb-6 pt-8 bg-foreground ">
-            <SheetTitle className="text-white mb-2">
+        <SheetContent side="left" className="h-full flex flex-col">
+          <div className=" w-full px-6  pt-8 bg-background flex-shrink-0">
+            <SheetTitle className="text-foreground mb-2">
               {session ? session.user?.name : "User Name"}
             </SheetTitle>
-            <SheetTitle className="text-md text-white">Progress</SheetTitle>
-            <Progress className="text-white mt-1" value={33} />
+            <SheetTitle className="text-md ">Progress</SheetTitle>
+            <Progress className=" mt-1" value={33} />
           </div>
 
-          <div className="overflow-y-auto overflow-x-hidden pt-2 p-6">
+          <div className="overflow-y-auto pt-2 p-6  flex-grow">
             {sidebarData.map((topic: any, index: number) => {
               return (
                 <Accordion key={index} type="single" collapsible>
@@ -58,17 +58,21 @@ function Sidebar() {
                         {topic.name}
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="flex flex-col gap-1 pl-6 mb-2 text-muted-foreground">
+                    <AccordionContent className="flex flex-col gap-2 pl-6 mb-2">
                       {topic && topic.problem.length > 0 ? (
                         topic.problem.map((problem: Problem, index: number) => {
                           return (
-                            <div key={index} className="flex gap-2">
-                              <Binary className="w-4 h-5 text-muted-foreground" />
+                            <div
+                              key={index}
+                              className="flex gap-2 items-center"
+                            >
+                              <Binary className="w-4 h-4 text-primary" />
                               <Link
                                 href={`/problems/${problem.name.replace(/\s+/g, "-")}`}
-                                className="hover:text-foreground"
+                                className="hover:text-primary flex items-center gap-2 "
                               >
                                 {problem.name}
+                                <ExternalLink className="w-3 h-3 text-muted-foreground" />
                               </Link>
                             </div>
                           );
@@ -82,11 +86,6 @@ function Sidebar() {
               );
             })}
           </div>
-
-          <SheetDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
-          </SheetDescription>
         </SheetContent>
       )}
     </Sheet>

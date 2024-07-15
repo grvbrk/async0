@@ -299,7 +299,7 @@ export default function CodeEditor({
           <Button
             variant="outline"
             size="lg"
-            className="border-primary"
+            className="border-primary "
             type="submit"
             onClick={handleRun}
             disabled={isPending}

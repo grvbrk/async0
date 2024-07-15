@@ -1,6 +1,5 @@
-import text1 from "../../public/text1.svg";
-import Image from "next/image";
-import ImageContainer from "./_components/ImageContainer";
+import TextImage from "./_components/TextImage";
+// import ImageContainer from "./_components/ImageContainer";
 
 export default function Home() {
   return (
@@ -13,13 +12,13 @@ export default function Home() {
           <h1 className="scroll-m-20 text-5xl font-extrabold lg:text-5xl">
             in Javascript.
           </h1>
-          <Image src={text1} alt="not-a-good-idea" width="400" />
+          <TextImage />
         </div>
         <div
           className="overflow-y-hidden p-5 hidden md:block"
           style={{ height: "calc(100vh - 64px)" }}
         >
-          <ImageContainer />
+          {/* <ImageContainer /> */}
         </div>
       </div>
     </>

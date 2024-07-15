@@ -22,24 +22,13 @@ import { unescapeCode } from "@repo/common";
 import AnimatePanel from "./AnimatePanel";
 import ProblemInfoCard from "./ProblemInfoCard";
 import ProblemSolutionCard from "./ProblemSolutionCard";
+import { Bookmark, Problem, Testcase } from "@repo/db";
 
 export type DisplayProblemPropType =
   | ({
-      testcases: {
-        id: string;
-        input: string;
-        output: string;
-        problemId: string | null;
-      }[];
-    } & {
-      id: string;
-      name: string;
-      difficulty: Difficulty;
-      isActiveForSubmission: boolean;
-      starterCode: string;
-      createdAt: Date;
-      updatedAt: Date;
-    })
+      bookmarks: Bookmark[];
+      testcases: Testcase[];
+    } & Problem)
   | null
   | undefined;
 
@@ -56,7 +45,6 @@ export default function DisplayProblem({
   const [isPending, startTransition] = useTransition();
   const [activeTab, setActiveTab] = useState<string>("problem");
   const [direction, setDirection] = useState<"left" | "right">("left");
-
   function handleTabChange(newTab: string) {
     const tabOrder = ["problem", "solution", "submission"];
     const currentIndex = tabOrder.indexOf(activeTab);
@@ -98,17 +86,17 @@ export default function DisplayProblem({
     >
       <ResizablePanel defaultSize={45} minSize={25}>
         <Tabs defaultValue="problem" className="p-4">
-          <TabsList className="flex justify-around w-full bg-transparent mb-2">
+          <TabsList className="flex justify-around w-full bg-transparent mb-2 ">
             <TabsTrigger
               value="problem"
-              className="w-full data-[state=active]:bg-muted"
+              className="w-full data-[state=active]:bg-foreground data-[state=active]:text-background"
               onClick={() => handleTabChange("problem")}
             >
               <BookOpen />
             </TabsTrigger>
             <TabsTrigger
               value="solution"
-              className="w-full data-[state=active]:bg-muted"
+              className="w-full data-[state=active]:bg-foreground data-[state=active]:text-background"
               onClick={() => {
                 handleTabChange("solution");
               }}
@@ -117,7 +105,7 @@ export default function DisplayProblem({
             </TabsTrigger>
             <TabsTrigger
               value="submission"
-              className="w-full data-[state=active]:bg-muted"
+              className="w-full data-[state=active]:bg-foreground data-[state=active]:text-background"
               onClick={() => {
                 handleTabChange("submission");
               }}

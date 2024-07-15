@@ -8,7 +8,8 @@ import {
   LiteralUnion,
 } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Input } from "@repo/ui/components/ui/input";
+import { Button } from "@repo/ui/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,11 +17,20 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@repo/ui/components/ui/dropdown-menu";
+
 import Link from "next/link";
-import { CircleUser, LogIn, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { LogIn, Search } from "lucide-react";
 import { BuiltInProviderType } from "next-auth/providers/index";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@repo/ui/components/ui/avatar";
+import { usePathname } from "next/navigation";
+import Sidebar from "../problems/_components/Sidebar";
+import { useTheme } from "next-themes";
+import { Switch } from "@repo/ui/components/ui/switch";
 
 type ProvidersResponse = Record<
   LiteralUnion<BuiltInProviderType, string>,
@@ -29,6 +39,8 @@ type ProvidersResponse = Record<
 
 export default function Navbar() {
   const { data: session } = useSession();
+  const { theme, setTheme } = useTheme();
+  const pathname = usePathname();
   const [providers, setProviders] = useState<ProvidersResponse | null>(null);
 
   useEffect(() => {
@@ -42,25 +54,34 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-white px-4 md:px-6 z-10">
+      <header className="sticky top-0 flex h-16 items-center gap-4 border-b  px-4 md:px-6 z-10">
         <nav className="pl-2 md:pl-4 flex-col gap-8 text-sm md:flex md:flex-row md:items-center md:gap-10 md:text-sm lg:gap-16">
+          {pathname != "/" && (
+            <Link
+              href="#"
+              className="font-bold transition-colors hover:text-primary text-muted-foreground"
+            >
+              <Sidebar />
+            </Link>
+          )}
+
           <Link
             href="/"
-            className="font-bold transition-colors hover:text-foreground"
+            className={`hidden md:block font-black text-foreground transition-colors hover:text-primary ${pathname === "/" && "text-primary"}`}
           >
             Async0
           </Link>
 
           <Link
             href="/problems"
-            className="hidden md:block text-muted-foreground transition-colors hover:text-foreground"
+            className={`hidden md:block text-muted-foreground transition-colors hover:text-primary ${pathname === "/problems" && "text-primary"}`}
           >
             Problems
           </Link>
 
           <Link
             href="/neetcode"
-            className="hidden md:block text-muted-foreground transition-colors hover:text-foreground"
+            className={`hidden md:block text-muted-foreground transition-colors hover:text-primary ${pathname === "/neetcode" && " text-primary"}`}
           >
             Neetcode 150
           </Link>
@@ -75,19 +96,25 @@ export default function Navbar() {
             />
           </div>
         </form>
+
+        <Switch
+          id="toggleMode"
+          checked={theme === "dark"}
+          onCheckedChange={() =>
+            theme === "light" ? setTheme("dark") : setTheme("light")
+          }
+        />
+
         {session ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="icon" className="rounded-full">
-                <CircleUser className="h-5 w-5" />
-                <span className="sr-only">Toggle user menu</span>
-              </Button>
+              <Avatar className="h-9 w-9 cursor-pointer">
+                <AvatarImage src={session.user?.image!} alt="pfp" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Support</DropdownMenuItem>
+              <DropdownMenuLabel>{session.user?.name}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => signOut()}>
                 Logout

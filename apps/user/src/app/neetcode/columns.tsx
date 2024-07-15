@@ -1,12 +1,12 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, Check, Code, X } from "lucide-react";
+import { ArrowUpDown, Check, Code, ExternalLink, X } from "lucide-react";
 import { Difficulty, List, Status } from "@repo/db";
 import { Badge } from "@repo/ui/components/ui/badge";
 import { useMemo } from "react";
 
-export type userProblemDetails = {
+export type NeetcodeProblemDetails = {
   id: string;
   name: string;
   difficulty: Difficulty;
@@ -22,9 +22,9 @@ export type userProblemDetails = {
   }[];
 };
 
-export function useGeneralColumns() {
+export function useNeetcodeColumns() {
   return useMemo(() => {
-    const columns: ColumnDef<userProblemDetails>[] = [
+    const columns: ColumnDef<NeetcodeProblemDetails>[] = [
       {
         accessorKey: "hasUserSolved",
         header: ({ column }) => {
@@ -104,15 +104,15 @@ export function useGeneralColumns() {
         },
       },
       {
-        accessorKey: "List",
+        accessorKey: "Link",
         header: ({ column }) => {
-          return <div className=" flex justify-center">List</div>;
+          return <div className=" flex justify-center">Neetcode Link</div>;
         },
         cell: ({ row }) => {
-          const list = row.getValue("List") as [List];
+          // const list = row.getValue("List") as [List];
           return (
             <div className="text-muted-foreground flex justify-center">
-              {list[0].name}
+              <ExternalLink className="h-5 w-5" />
             </div>
           );
         },

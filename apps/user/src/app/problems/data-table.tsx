@@ -21,17 +21,21 @@ import {
 import { Button } from "@repo/ui/components/ui/button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useGeneralColumns, userProblemDetails } from "./columns";
+import { useNeetcodeColumns } from "../neetcode/columns";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+  data: userProblemDetails[];
+  tag: string;
 }
 
 export function DataTable<TData, TValue>({
-  columns,
   data,
+  tag,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
+  const columns =
+    tag === "general" ? useGeneralColumns() : useNeetcodeColumns();
   const table = useReactTable({
     data,
     columns,
@@ -39,6 +43,7 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    initialState: { pagination: { pageSize: 25 } },
     state: {
       sorting,
     },
@@ -75,7 +80,6 @@ export function DataTable<TData, TValue>({
                 return (
                   <TableRow
                     key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
                     onClick={() => handleRowClick(row.getValue("name"))}
                     className="hover:cursor-pointer"
                   >
@@ -106,6 +110,10 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
+        <span className="mr-auto text-sm text-muted-foreground pl-2">
+          Page {table.getState().pagination.pageIndex + 1} of{" "}
+          {table.getPageCount()}
+        </span>
         <Button
           variant="outline"
           size="sm"

@@ -59,12 +59,12 @@ export const getProblemById = cache(async (problemId: string) => {
   }
 });
 
-export const getProblemByNameAndTestcases = cache(
-  async (problemName: string) => {
+export const getDisplayProblemInfo = cache(
+  async (problemName: string, user: any) => {
     try {
       return await prisma.problem.findFirst({
         where: { name: problemName },
-        include: { testcases: true },
+        include: { testcases: true, bookmarks: { where: { userId: user.id } } },
       });
     } catch (error) {
       console.log("ERROR FETCHING PROBLEM BY NAME", error);
@@ -73,3 +73,37 @@ export const getProblemByNameAndTestcases = cache(
     }
   }
 );
+
+export const getAllNeetcodeProblems = cache(async (user: any) => {
+  try {
+    return await prisma.problem.findMany({
+      where: { List: { some: { name: "Neetcode" } } },
+      select: {
+        id: true,
+        name: true,
+        difficulty: true,
+        topics: {
+          select: {
+            name: true,
+          },
+        },
+        hasUserSolved: {
+          where: { userId: user.id },
+          select: {
+            Submission: {
+              select: {
+                status: true,
+                passedTestcases: true,
+                totalTestcases: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  } catch (error) {
+    console.log("ERROR FETCHING ALL PROBLEMS", error);
+  } finally {
+    await prisma.$disconnect();
+  }
+});

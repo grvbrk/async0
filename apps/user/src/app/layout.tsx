@@ -1,11 +1,22 @@
 import type { Metadata } from "next";
 import AuthProvider from "@/components/AuthProvider";
-import { Inter } from "next/font/google";
+import { Inter, Ubuntu_Mono, Fira_Code } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "@/components/ui/sonner";
 import Navbar from "./_components/Navbar";
+import { Toaster } from "@repo/ui/components/ui/sonner";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const inter = Inter({ subsets: ["latin"] });
+const ubuntuMono = Ubuntu_Mono({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-ubuntu-mono",
+});
+const firaCode = Fira_Code({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-fira-code",
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,14 +29,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <AuthProvider>
-      <html lang="en">
-        <body className={inter.className}>
-          <Navbar />
-          {children}
-          <Toaster richColors />
-        </body>
-      </html>
-    </AuthProvider>
+    <html lang="en">
+      <body
+        className={`${inter.className} ${ubuntuMono.variable} ${firaCode.variable}`}
+      >
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <AuthProvider>
+            <Navbar />
+
+            {children}
+            <Toaster richColors />
+          </AuthProvider>
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }

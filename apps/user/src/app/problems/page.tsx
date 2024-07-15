@@ -1,4 +1,3 @@
-import { columns } from "./columns";
 import { DataTable } from "./data-table";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
@@ -16,7 +15,7 @@ export default async function ProblemsPage() {
   return (
     <>
       <div className="container mt-5">
-        <DataTable columns={columns} data={userProblemDetails} />
+        <DataTable data={userProblemDetails} tag="general" />
       </div>
     </>
   );

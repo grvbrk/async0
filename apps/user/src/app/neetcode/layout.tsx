@@ -1,6 +1,6 @@
-import BreadCrumbs from "./_components/BreadCrumbs";
+import BreadCrumbs from "../problems/_components/BreadCrumbs";
 
-export default async function ProblemsLayout({
+export default async function NeetcodeProblemsLayout({
   children,
 }: {
   children: React.ReactNode;
