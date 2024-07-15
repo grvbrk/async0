@@ -15,6 +15,9 @@ model User {
   hasUserSolved hasUserSolved[]
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @default(now()) @updatedAt
+  Like          Like[]
+  Dislike       Dislike[]
+  SavedSolution SavedSolution[]
 }
 
 model Problem {
@@ -31,6 +34,7 @@ model Problem {
   hasUserSolved         hasUserSolved[]
   createdAt             DateTime        @default(now())
   updatedAt             DateTime        @default(now()) @updatedAt
+  Solution              Solution[]
 
   @@index([name])
 }
@@ -47,6 +51,59 @@ model Bookmark {
   @@unique([userId, problemId])
   @@index([userId])
   @@index([problemId])
+}
+
+model Solution {
+  id        String          @id @default(uuid())
+  code      String
+  Problem   Problem         @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  problemId String
+  likes     Like[]
+  dislikes  Dislike[]
+  savedBy   SavedSolution[]
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @default(now()) @updatedAt
+
+  @@index([problemId])
+}
+
+model Like {
+  id         String   @id @default(uuid())
+  User       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  Solution   Solution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
+  solutionId String
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, solutionId])
+  @@index([userId])
+  @@index([solutionId])
+}
+
+model Dislike {
+  id         String   @id @default(uuid())
+  User       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  Solution   Solution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
+  solutionId String
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, solutionId])
+  @@index([userId])
+  @@index([solutionId])
+}
+
+model SavedSolution {
+  id         String   @id @default(uuid())
+  User       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  Solution   Solution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
+  solutionId String
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, solutionId])
+  @@index([userId])
+  @@index([solutionId])
 }
 
 model Submission {
