@@ -10,6 +10,7 @@ datasource db {
 model User {
   id            String          @id @default(uuid())
   email         String          @unique
+  bookmarks     Bookmark[]
   submissions   Submission[]
   hasUserSolved hasUserSolved[]
   createdAt     DateTime        @default(now())
@@ -22,6 +23,7 @@ model Problem {
   difficulty            Difficulty      @default(NA)
   isActiveForSubmission Boolean         @default(true)
   starterCode           String
+  bookmarks             Bookmark[]
   submissions           Submission[]
   testcases             Testcase[]
   topics                Topic[]
@@ -31,6 +33,20 @@ model Problem {
   updatedAt             DateTime        @default(now()) @updatedAt
 
   @@index([name])
+}
+
+model Bookmark {
+  id        String   @id @default(uuid())
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  Problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  problemId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@unique([userId, problemId])
+  @@index([userId])
+  @@index([problemId])
 }
 
 model Submission {
