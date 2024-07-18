@@ -14,17 +14,22 @@ import {
   AccordionTrigger,
 } from "@repo/ui/components/ui/accordion";
 import { Progress } from "@repo/ui/components/ui/progress";
-import { AlignJustify, Binary, CodeXml, ExternalLink } from "lucide-react";
+import {
+  AlignJustify,
+  Binary,
+  CodeXml,
+  ExternalLink,
+  LibraryBig,
+  User,
+} from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Problem } from "@repo/db";
 import { useState } from "react";
 import { getSidebarData } from "@/app/actions/topics";
-import { usePathname } from "next/navigation";
 
 function Sidebar() {
   const { data: session } = useSession();
-  const pathname = usePathname();
   const [sidebarData, setSidebarData] = useState<any>([]);
 
   async function handleSidebarClick() {
@@ -39,15 +44,44 @@ function Sidebar() {
       </SheetTrigger>
       {sidebarData && (
         <SheetContent side="left" className="h-full flex flex-col">
-          <div className=" w-full px-6  pt-8 bg-background flex-shrink-0">
-            <SheetTitle className="text-foreground mb-2">
-              {session ? session.user?.name : "User Name"}
-            </SheetTitle>
-            <SheetTitle className="text-md ">Progress</SheetTitle>
-            <Progress className=" mt-1" value={33} />
-          </div>
+          <SheetTitle className="pl-6 text-2xl font-black mt-4">
+            Async0
+          </SheetTitle>
 
-          <div className="overflow-y-auto pt-2 p-6  flex-grow">
+          {session && session.user ? (
+            <>
+              <div className=" w-full px-6 bg-background flex-shrink-0 ">
+                <SheetTitle className="text-foreground flex gap-1">
+                  <div className="flex  items-center justify-center gap-1">
+                    <LibraryBig className="h-5 w-5" />
+                    <div className="text-sm">All Problems</div>
+                  </div>
+                  <div className="flex ml-auto items-center justify-center gap-1 text-muted-foreground">
+                    <User className="h-4 w-4" />
+                    <div className="text-sm">{session.user.email}</div>
+                  </div>
+                </SheetTitle>
+                <Progress className="mt-1" value={80} />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className=" w-full px-6 bg-background flex-shrink-0 ">
+                <SheetTitle className="text-foreground flex gap-1">
+                  <div className="flex items-center justify-center gap-1">
+                    <LibraryBig className="h-5 w-5" />
+                    <div className="text-sm">All Problems</div>
+                  </div>
+                  <div className="flex ml-auto items-center justify-center gap-1 text-muted-foreground">
+                    <User className="h-4 w-4" />
+                    <div className="text-sm">User</div>
+                  </div>
+                </SheetTitle>
+                <Progress className="mt-1" value={80} />
+              </div>
+            </>
+          )}
+          <div className="overflow-y-auto px-6 flex-grow ">
             {sidebarData.map((topic: any, index: number) => {
               return (
                 <Accordion key={index} type="single" collapsible>
@@ -58,7 +92,7 @@ function Sidebar() {
                         {topic.name}
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="flex flex-col gap-2 pl-6 mb-2">
+                    <AccordionContent className="flex flex-col gap-2 pl-6 mb-2 text-muted-foreground">
                       {topic && topic.problem.length > 0 ? (
                         topic.problem.map((problem: Problem, index: number) => {
                           return (
@@ -86,6 +120,7 @@ function Sidebar() {
               );
             })}
           </div>
+          <SheetDescription></SheetDescription>
         </SheetContent>
       )}
     </Sheet>

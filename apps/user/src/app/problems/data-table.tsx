@@ -1,13 +1,13 @@
 "use client";
 
 import {
-  ColumnDef,
   SortingState,
   flexRender,
   getCoreRowModel,
   useReactTable,
   getSortedRowModel,
   getPaginationRowModel,
+  ColumnDef,
 } from "@tanstack/react-table";
 
 import {
@@ -21,24 +21,29 @@ import {
 import { Button } from "@repo/ui/components/ui/button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useGeneralColumns, userProblemDetails } from "./columns";
-import { useNeetcodeColumns } from "../neetcode/columns";
+import { useGeneralColumns, userProblemDetailsType } from "./columns";
+import {
+  NeetcodeProblemDetails,
+  useNeetcodeColumns,
+} from "../neetcode/columns";
 
-interface DataTableProps<TData, TValue> {
-  data: userProblemDetails[];
-  tag: string;
-}
+type ProblemDetails = userProblemDetailsType | NeetcodeProblemDetails;
 
-export function DataTable<TData, TValue>({
+type DataTableProps<TData extends ProblemDetails> = {
+  data: TData[];
+  tag: "general" | "neetcode";
+};
+
+export function DataTable<TData extends ProblemDetails>({
   data,
   tag,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const columns =
     tag === "general" ? useGeneralColumns() : useNeetcodeColumns();
   const table = useReactTable({
     data,
-    columns,
+    columns: columns as ColumnDef<TData, any>[],
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
@@ -48,6 +53,7 @@ export function DataTable<TData, TValue>({
       sorting,
     },
   });
+
   const router = useRouter();
 
   function handleRowClick(problemName: string) {

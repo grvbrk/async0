@@ -6,14 +6,14 @@ import { Difficulty, List, Status } from "@repo/db";
 import { Badge } from "@repo/ui/components/ui/badge";
 import { useMemo } from "react";
 
-export type userProblemDetails = {
+export type userProblemDetailsType = {
   id: string;
   name: string;
   difficulty: Difficulty;
   topics: {
     name: string;
   }[];
-  hasUserSolved: {
+  hasUserSolved?: {
     Submission: {
       status: Status;
       passedTestcases: number;
@@ -22,9 +22,9 @@ export type userProblemDetails = {
   }[];
 };
 
-export function useGeneralColumns() {
+export function useGeneralColumns(): ColumnDef<userProblemDetailsType>[] {
   return useMemo(() => {
-    const columns: ColumnDef<userProblemDetails>[] = [
+    const columns: ColumnDef<userProblemDetailsType>[] = [
       {
         accessorKey: "hasUserSolved",
         header: ({ column }) => {

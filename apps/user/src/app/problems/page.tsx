@@ -1,14 +1,13 @@
 import { DataTable } from "./data-table";
-import { getServerSession } from "next-auth";
+import { DefaultUser, getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { findAllProblemsForUser } from "../actions/problems";
 
 export default async function ProblemsPage() {
   const session = await getServerSession(authOptions);
-  const user = session?.user;
-
+  const user = session?.user as DefaultUser;
   const userProblemDetails = await findAllProblemsForUser(user);
-  if (!userProblemDetails || !user) {
+  if (!userProblemDetails) {
     return <h1>Not found</h1>;
   }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { ReactNode } from "react";
 import { Card } from "@repo/ui/components/ui/card";
 import { Separator } from "@repo/ui/components/ui/separator";
 import { Testcase } from "@repo/db";
@@ -69,7 +69,7 @@ export default function TestCaseBlock({
       <Separator className="mb-2 w-5/6" />
       <div>
         <pre className="overflow-x-auto ">
-          <code>{unescapeCode(testcase.input)}</code>
+          <code>{unescapeCode(testcase.input) as ReactNode}</code>
         </pre>
         <pre className="overflow-x-auto ">
           {`Output: ${unescapeCode(testcase.output)}`}

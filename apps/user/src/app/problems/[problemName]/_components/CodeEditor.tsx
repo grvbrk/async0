@@ -24,7 +24,6 @@ import { Switch } from "@repo/ui/components/ui/switch";
 import { Tabs, TabsList } from "@repo/ui/components/ui/tabs";
 import Counter from "./Counter";
 import { AnimatePresence, motion } from "framer-motion";
-import { useTheme } from "next-themes";
 
 type CodeEditorPropsType = {
   placeholderCode: string;
@@ -289,17 +288,17 @@ export default function CodeEditor({
           </AnimatePresence>
         </Card>
         <div className="flex justify-end gap-2 mt-2">
-          <Button size="lg" className="mr-auto" onClick={toggleConsole}>
+          <Button size="lg" className="mr-auto " onClick={toggleConsole}>
             Console
             <ChevronUp
-              className={`ml-2 ${showConsole ? "transition-all duration-400 ease-in-out rotate-180" : "transition-all duration-400 ease-in-out"}`}
+              className={`ml-2 ${showConsole ? "transition-all duration-400 ease-in-out rotate-180" : "transition-all duration-400 ease-in-out"} `}
               size="14"
             />
           </Button>
           <Button
             variant="outline"
             size="lg"
-            className="border-primary "
+            className="border-primary"
             type="submit"
             onClick={handleRun}
             disabled={isPending}

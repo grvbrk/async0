@@ -15,20 +15,37 @@ import {
 } from "@repo/ui/components/ui/card";
 import { BookOpen, Code, NotebookText } from "lucide-react";
 import CodeEditor from "./CodeEditor";
-import { Difficulty } from "@prisma/client";
 import { useState, useTransition } from "react";
 import { codeSubmission } from "@/app/actions/codeSubmission";
 import { unescapeCode } from "@repo/common";
 import AnimatePanel from "./AnimatePanel";
 import ProblemInfoCard from "./ProblemInfoCard";
 import ProblemSolutionCard from "./ProblemSolutionCard";
-import { Bookmark, Problem, Testcase } from "@repo/db";
+import { Bookmark, Problem, Solution, Testcase } from "@repo/db";
+
+export type SolutionWithCounts = Solution & {
+  _count: {
+    likes: number;
+    dislikes: number;
+  };
+  savedBy?: { id: string }[];
+  likes?: { id: string }[];
+  dislikes?: { id: string }[];
+  isSaved?: boolean;
+  isLiked?: boolean;
+  isDisliked?: boolean;
+};
 
 export type DisplayProblemPropType =
-  | ({
-      bookmarks: Bookmark[];
+  | {
+      id: string;
+      name: string;
+      difficulty: string;
+      starterCode: string;
+      Solution: SolutionWithCounts[];
       testcases: Testcase[];
-    } & Problem)
+      bookmarks?: Bookmark[];
+    }
   | null
   | undefined;
 
@@ -58,12 +75,10 @@ export default function DisplayProblem({
 
     setActiveTab(newTab);
   }
-
   async function handleTestcaseSubmission(code: string, run: boolean) {
     startTransition(async () => {
       // response variable gets the final result from judge0
       const response = await codeSubmission(code, problem, problemName, run);
-      // console.log("RESPONSE", response);
       if (response && Array.isArray(response)) {
         const firstErrorIndex = response.findIndex((problem: any) =>
           [4, 5, 6, 7, 8, 9, 10, 11, 12].includes(problem.value.status.id)
@@ -125,11 +140,8 @@ export default function DisplayProblem({
             ) : (
               <Card className="h-[75vh] overflow-y-auto">
                 <CardHeader>
-                  <CardTitle>Password</CardTitle>
-                  <CardDescription>
-                    Change your password here. After saving, you'll be logged
-                    out.
-                  </CardDescription>
+                  <CardTitle>Submissions</CardTitle>
+                  <CardDescription>No submission found.</CardDescription>
                 </CardHeader>
               </Card>
             )}
