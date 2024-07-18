@@ -4,68 +4,47 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 47.4% 11.2%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 47.4% 11.2%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 100% 50%;
-    --destructive-foreground: 210 40% 98%;
-
-    --ring: 215 20.2% 65.1%;
-
+    --background: 45 100% 95%;
+    --foreground: 45 5% 0%;
+    --card: 45 50% 90%;
+    --card-foreground: 45 5% 10%;
+    --popover: 45 100% 95%;
+    --popover-foreground: 45 100% 0%;
+    --primary: 45 89.9% 57.3%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 45 30% 70%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 7 30% 85%;
+    --muted-foreground: 45 5% 35%;
+    --accent: 7 30% 80%;
+    --accent-foreground: 45 5% 10%;
+    --destructive: 0 100% 30%;
+    --destructive-foreground: 45 5% 90%;
+    --border: 45 30% 50%;
+    --input: 45 30% 18%;
+    --ring: 45 89.9% 57.3%;
     --radius: 0.5rem;
   }
-
   .dark {
-    --background: 224 71% 4%;
-    --foreground: 213 31% 91%;
-
-    --muted: 223 47% 11%;
-    --muted-foreground: 215.4 16.3% 56.9%;
-
-    --accent: 216 34% 17%;
-    --accent-foreground: 210 40% 98%;
-
-    --popover: 224 71% 4%;
-    --popover-foreground: 215 20.2% 65.1%;
-
-    --border: 216 34% 17%;
-    --input: 216 34% 17%;
-
-    --card: 224 71% 4%;
-    --card-foreground: 213 31% 91%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 1.2%;
-
-    --secondary: 222.2 47.4% 11.2%;
-    --secondary-foreground: 210 40% 98%;
-
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-
-    --ring: 216 34% 17%;
-
+    --background: 45 50% 5%;
+    --foreground: 45 5% 90%;
+    --card: 45 50% 0%;
+    --card-foreground: 45 5% 90%;
+    --popover: 45 50% 5%;
+    --popover-foreground: 45 5% 90%;
+    --primary: 45 89.9% 57.3%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 45 30% 10%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 7 30% 15%;
+    --muted-foreground: 45 5% 60%;
+    --accent: 7 30% 15%;
+    --accent-foreground: 45 5% 90%;
+    --destructive: 0 100% 30%;
+    --destructive-foreground: 45 5% 90%;
+    --border: 45 30% 18%;
+    --input: 45 30% 18%;
+    --ring: 45 89.9% 57.3%;
     --radius: 0.5rem;
   }
 }
@@ -81,3 +60,69 @@
       "calt" 1;
   }
 }
+
+/* :root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 47.4% 11.2%;
+
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 47.4% 11.2%;
+
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 47.4% 11.2%;
+
+  --primary: 222.2 47.4% 11.2%;
+  --primary-foreground: 210 40% 98%;
+
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+
+  --destructive: 0 100% 50%;
+  --destructive-foreground: 210 40% 98%;
+
+  --ring: 215 20.2% 65.1%;
+
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 224 71% 4%;
+  --foreground: 213 31% 91%;
+
+  --muted: 223 47% 11%;
+  --muted-foreground: 215.4 16.3% 56.9%;
+
+  --accent: 216 34% 17%;
+  --accent-foreground: 210 40% 98%;
+
+  --popover: 224 71% 4%;
+  --popover-foreground: 215 20.2% 65.1%;
+
+  --border: 216 34% 17%;
+  --input: 216 34% 17%;
+
+  --card: 224 71% 4%;
+  --card-foreground: 213 31% 91%;
+
+  --primary: 210 40% 98%;
+  --primary-foreground: 222.2 47.4% 1.2%;
+
+  --secondary: 222.2 47.4% 11.2%;
+  --secondary-foreground: 210 40% 98%;
+
+  --destructive: 0 63% 31%;
+  --destructive-foreground: 210 40% 98%;
+
+  --ring: 216 34% 17%;
+
+  --radius: 0.5rem;
+} */

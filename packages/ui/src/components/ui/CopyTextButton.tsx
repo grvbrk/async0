@@ -29,7 +29,7 @@ export function CopyTextButton({
     <Button
       onClick={handleClick}
       variant={variant || "ghost"}
-      className={`hover:bg-transparent hover:text-black ${className}`}
+      className={`hover:bg-transparent hover:text-primary ${className}`}
       size={size}
     >
       {copied ? (
