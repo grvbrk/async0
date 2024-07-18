@@ -20,7 +20,7 @@ import {
 } from "@repo/ui/components/ui/dropdown-menu";
 
 import Link from "next/link";
-import { LogIn, Search } from "lucide-react";
+import { Loader2, LogIn, Search } from "lucide-react";
 import { BuiltInProviderType } from "next-auth/providers/index";
 import {
   Avatar,
@@ -31,6 +31,7 @@ import { usePathname } from "next/navigation";
 import Sidebar from "../problems/_components/Sidebar";
 import { useTheme } from "next-themes";
 import { Switch } from "@repo/ui/components/ui/switch";
+import { Skeleton } from "@repo/ui/components/ui/skeleton";
 
 type ProvidersResponse = Record<
   LiteralUnion<BuiltInProviderType, string>,
@@ -38,10 +39,12 @@ type ProvidersResponse = Record<
 >;
 
 export default function Navbar() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const [providers, setProviders] = useState<ProvidersResponse | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const [auth0Authenticated, setAuth0Authenticated] = useState(false);
 
   useEffect(() => {
     async function setAuthProviders() {
@@ -50,7 +53,25 @@ export default function Navbar() {
     }
 
     setAuthProviders();
+    setMounted(true);
   }, []);
+
+  if (!mounted || status === "loading")
+    return (
+      <div className="sticky top-0 w-full h-16 flex items-center justify-between gap-4 border-b px-4 md:px-6 z-10 bg-background">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-8 w-24" />
+          <Skeleton className="h-4 w-16 hidden md:block" />
+          <Skeleton className="h-4 w-16 hidden md:block" />
+          <Skeleton className="h-4 w-16 hidden md:block" />
+        </div>
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-8 w-48 hidden sm:block" />
+          <Skeleton className="h-8 w-8 rounded-full" />
+          <Skeleton className="h-9 w-9 rounded-full" />
+        </div>
+      </div>
+    );
 
   return (
     <>
@@ -105,7 +126,12 @@ export default function Navbar() {
           }
         />
 
-        {session ? (
+        {auth0Authenticated ? (
+          <Button disabled>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Signing in...
+          </Button>
+        ) : session ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Avatar className="h-9 w-9 cursor-pointer">
@@ -125,7 +151,13 @@ export default function Navbar() {
           providers &&
           Object.values(providers).map((provider, idx) => {
             return (
-              <Button key={idx} onClick={() => signIn(provider.id)}>
+              <Button
+                key={idx}
+                onClick={() => {
+                  setAuth0Authenticated(true);
+                  signIn(provider.id);
+                }}
+              >
                 <LogIn size="16" className="mr-2" />
                 Sign in
               </Button>
