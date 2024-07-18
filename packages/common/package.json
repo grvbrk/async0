@@ -7,15 +7,24 @@
   "exports": {
     "./driver/*": "./src/driver-code/*.ts",
     "./problem-ui/*": "./src/problem-ui/*.tsx",
+    "./solution-ui/*": "./src/solution-ui/*.tsx",
     ".": "./src/index.ts"
   },
   "devDependencies": {
     "@repo/db": "*",
     "@repo/ui": "*",
+    "@types/prismjs": "^1.26.4",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "tailwindcss": "^3.4.4"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "lucide-react": "^0.408.0",
+    "prism-themes": "^1.9.0",
+    "prismjs": "^1.29.0",
+    "react-syntax-highlighter": "^15.5.0"
+  }
 }
