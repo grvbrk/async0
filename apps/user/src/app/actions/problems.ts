@@ -79,35 +79,45 @@ export const getProblemById = cache(async (problemId: string) => {
 });
 
 export const getDisplayProblemInfo = cache(
-  async (problemName: string, user: any) => {
+  async (problemName: string, user: DefaultUser) => {
     try {
-      if (user) {
-        const problem = await prisma.problem.findFirst({
-          where: { name: problemName },
-          include: {
-            testcases: true,
-            Solution: {
-              include: {
-                _count: { select: { likes: true, dislikes: true } },
-                savedBy: { where: { userId: user.id }, select: { id: true } },
-              },
+      const problem = await prisma.problem.findFirst({
+        where: { name: problemName },
+        include: {
+          testcases: true,
+          Solution: {
+            include: {
+              _count: { select: { likes: true, dislikes: true } },
+              ...(user
+                ? {
+                    savedBy: {
+                      where: { userId: user.id },
+                      select: { id: true },
+                    },
+                    likes: {
+                      where: { userId: user.id },
+                      select: { id: true },
+                    },
+                    dislikes: {
+                      where: { userId: user.id },
+                      select: { id: true },
+                    },
+                  }
+                : {}),
             },
-            bookmarks: { where: { userId: user.id } },
           },
-        });
-        return problem;
-      } else {
-        const problem = await prisma.problem.findFirst({
-          where: { name: problemName },
-          include: {
-            testcases: true,
-            Solution: {
-              include: { _count: { select: { likes: true, dislikes: true } } },
-            },
-          },
-        });
-        return problem;
+          ...(user ? { bookmarks: { where: { userId: user.id } } } : {}),
+        },
+      });
+      if (problem && problem.Solution) {
+        problem.Solution = problem.Solution.map((solution) => ({
+          ...solution,
+          isSaved: solution.savedBy && solution.savedBy.length > 0,
+          isLiked: solution.likes && solution.likes.length > 0,
+          isDisliked: solution.dislikes && solution.dislikes.length > 0,
+        }));
       }
+      return problem;
     } catch (error) {
       console.log("ERROR FETCHING PROBLEM BY NAME", error);
     } finally {

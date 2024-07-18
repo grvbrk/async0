@@ -5,26 +5,7 @@ import axios from "axios";
 import { cache } from "react";
 import { duplicateInteger, isAnagram } from "@repo/common/driver/driver-code";
 import { judge0TokenResponseType } from "@repo/common";
-
-type DisplayProblemPropType =
-  | ({
-      testcases: {
-        id: string;
-        input: string;
-        output: string;
-        problemId: string | null;
-      }[];
-    } & {
-      id: string;
-      name: string;
-      difficulty: Difficulty;
-      isActiveForSubmission: boolean;
-      starterCode: string;
-      createdAt: Date;
-      updatedAt: Date;
-    })
-  | null
-  | undefined;
+import { DisplayProblemPropType } from "../problems/[problemName]/_components/DisplayProblem";
 
 const problemTable: Record<string, any> = {
   duplicateinteger: duplicateInteger,
