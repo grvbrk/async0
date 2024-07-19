@@ -3,6 +3,8 @@
 import { Difficulty, PopularLists } from "@repo/db";
 import { cache } from "react";
 import prisma from "@repo/db";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export const addProblem = cache(
   async (
@@ -48,6 +50,9 @@ export const addProblem = cache(
     } finally {
       await prisma.$disconnect();
     }
+    revalidatePath("/");
+    revalidatePath("/problems");
+    redirect("/problems");
   }
 );
 
@@ -58,9 +63,11 @@ export const updateProblem = cache(
     difficulty: Difficulty,
     starterCode: string,
     testcases: { input: string; output: string }[],
+    solutions: string[],
     topicName: string,
     listName: PopularLists
   ) => {
+    console.log(solutions);
     try {
       const topic = await prisma.topic.findFirst({
         where: {
@@ -84,6 +91,10 @@ export const updateProblem = cache(
           difficulty,
           starterCode,
           testcases: { deleteMany: {}, create: testcases },
+          Solution: {
+            deleteMany: {},
+            create: solutions.map((solution) => ({ code: solution })),
+          },
           topics: { set: [], connect: [{ id: topic.id }] },
           List: { set: [], connect: [{ id: list.id }] },
         },
@@ -93,13 +104,16 @@ export const updateProblem = cache(
     } finally {
       await prisma.$disconnect();
     }
+    revalidatePath("/");
+    revalidatePath("/problems");
+    redirect("/problems");
   }
 );
 
-export const getAllProblemsWithTestcases = cache(async () => {
+export const getAllProblemsWithTestcasesAndTopic = cache(async () => {
   try {
     const problems = await prisma.problem.findMany({
-      include: { testcases: true },
+      include: { testcases: true, topics: true, List: true },
     });
     return problems;
   } catch (error) {
@@ -117,4 +131,8 @@ export const deleteOneProblem = cache(async (id: string) => {
   } finally {
     await prisma.$disconnect();
   }
+
+  revalidatePath("/");
+  revalidatePath("/problems");
+  redirect("/problems");
 });

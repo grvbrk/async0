@@ -14,7 +14,7 @@ export default async function EditProductPage({
   const topicsPromise = getAllTopics();
   const problemPromise = prisma.problem.findUnique({
     where: { id: problemId },
-    include: { testcases: true, List: true, topics: true },
+    include: { testcases: true, List: true, topics: true, Solution: true },
   });
 
   const [lists, topics, problem] = await Promise.all([

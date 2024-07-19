@@ -1,6 +1,6 @@
+import { escapeCode } from "@repo/common";
 import { addProblem, updateProblem } from "./problems";
 import { Difficulty, PopularLists } from "@repo/db";
-import { redirect } from "next/navigation";
 
 export async function addOneProblem(prevState: unknown, formData: FormData) {
   const data = Object.fromEntries(formData.entries());
@@ -10,8 +10,8 @@ export async function addOneProblem(prevState: unknown, formData: FormData) {
     if (key.startsWith("input")) {
       const id = Number(key.split("-")[1]);
       testcases.push({
-        input: String(data[key]),
-        output: String(data[`output-${id}`]),
+        input: escapeCode(String(data[key])).trim(),
+        output: escapeCode(String(data[`output-${id}`])).trim(),
       });
       delete data[key];
     }
@@ -26,7 +26,7 @@ export async function addOneProblem(prevState: unknown, formData: FormData) {
   const difficulty = data.difficulty as Difficulty;
   const listName = data.list as PopularLists;
   const topicName = data.topic as string;
-  const starterCode = data.placeholderCode as string;
+  const starterCode = escapeCode(data.placeholderCode as string);
 
   try {
     await addProblem(
@@ -37,9 +37,8 @@ export async function addOneProblem(prevState: unknown, formData: FormData) {
       topicName,
       listName
     );
-    redirect("/problems");
   } catch (error) {
-    console.log("ERROR ADDING PROBLEM AND TESTCASES");
+    console.log("ERROR ADDING PROBLEM AND TESTCASES", error);
     return error;
   }
 }
@@ -51,13 +50,14 @@ export async function updateOneProblem(
 ) {
   const data = Object.fromEntries(formData.entries());
   const testcases: { input: string; output: string }[] = [];
+  const solutions: string[] = [];
 
   for (let key in data) {
     if (key.startsWith("input")) {
       const id = Number(key.split("-")[1]);
       testcases.push({
-        input: String(data[key]),
-        output: String(data[`output-${id}`]),
+        input: escapeCode(String(data[key])).trim(),
+        output: escapeCode(String(data[`output-${id}`])).trim(),
       });
       delete data[key];
     }
@@ -67,13 +67,17 @@ export async function updateOneProblem(
     if (key.startsWith("$ACTION")) {
       delete data[key];
     }
+    if (key.startsWith("solution")) {
+      solutions.push(String(data[key]));
+      delete data[key];
+    }
   }
+
   const name = data.name as string;
   const difficulty = data.difficulty as Difficulty;
   const listName = data.list as PopularLists;
   const topicName = data.topic as string;
-  const starterCode = data.placeholderCode as string;
-
+  const starterCode = escapeCode(data.placeholderCode as string);
   try {
     await updateProblem(
       id,
@@ -81,12 +85,12 @@ export async function updateOneProblem(
       difficulty,
       starterCode,
       testcases,
+      solutions,
       topicName,
       listName
     );
-    redirect("/problems");
   } catch (error) {
-    console.log("ERROR UPDATING PROBLEM AND TESTCASES");
+    console.log("ERROR UPDATING PROBLEM AND TESTCASES", error);
     return error;
   }
 }

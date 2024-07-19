@@ -16,17 +16,19 @@ import {
   SelectItem,
 } from "@repo/ui/components/ui/select";
 import { Input } from "@repo/ui/components/ui/input";
-import { List, Problem, Topic } from "@repo/db";
+import { List, Problem, Solution, Topic } from "@repo/db";
 import { toast } from "sonner";
 import { Testcase } from "@repo/db";
 import { Textarea } from "@repo/ui/components/ui/textarea";
-import { deleteOneProblem, updateProblem } from "@/actions/problems";
+import { deleteOneProblem } from "@/actions/problems";
+import { unescapeCode } from "@repo/common";
 
 type ProblemFormType = {
   problem?: {
     List: List[];
     topics: Topic[];
     testcases: Testcase[];
+    Solution: Solution[];
   } & Problem;
   lists?: List[];
   topics?: Topic[];
@@ -43,6 +45,9 @@ export default function ProblemForm({
     {}
   );
 
+  const [solutions, setSolutions] = useState<Partial<Solution>[]>(
+    problem?.Solution || []
+  );
   const [testCases, setTestCases] = useState<Partial<Testcase>[]>(
     problem?.testcases.map((tc) => ({
       input: tc.input,
@@ -64,9 +69,11 @@ export default function ProblemForm({
     field: keyof Testcase,
     value: string
   ) {
-    const updatedTestCases = [...testCases];
-    updatedTestCases[idx][field] = value;
-    setTestCases(updatedTestCases);
+    setTestCases((prevState) => {
+      return prevState.map((tc, index) => {
+        return index === idx ? { ...tc, [field]: value } : tc;
+      });
+    });
   }
 
   function addTestCase() {
@@ -75,6 +82,14 @@ export default function ProblemForm({
 
   function removeTestCase(idx: number) {
     setTestCases(testCases.filter((_, i) => i !== idx));
+  }
+
+  function handleSolutionChange(idx: number, value: string) {
+    setSolutions((prevState) => {
+      return prevState.map((solution, index) => {
+        return index === idx ? { ...solution, code: value } : solution;
+      });
+    });
   }
 
   return (
@@ -149,54 +164,105 @@ export default function ProblemForm({
           id="placeholderCode"
           name="placeholderCode"
           placeholder="starter code..."
-          defaultValue={problem?.starterCode || ""}
+          defaultValue={unescapeCode(problem?.starterCode!) || ""}
           rows={4}
           required
         />
       </div>
 
+      <div className="space-y-2 mt-5 ">
+        <Label htmlFor="Solutions">Solutions</Label>
+        {solutions.length > 0 ? (
+          solutions.map((solution, idx) => {
+            return (
+              <div key={idx} className="flex gap-4 items-end">
+                <Textarea
+                  className="w-full"
+                  id={`solution-${idx}`}
+                  name={`solution-${idx}`}
+                  placeholder="Your solution here..."
+                  value={unescapeCode(solution.code as string) || ""}
+                  rows={16}
+                  onChange={(e) => handleSolutionChange(idx, e.target.value)}
+                  required
+                />
+
+                <Button
+                  variant="ghost"
+                  className="hover:bg-transparent p-0 m-0 flex self-end"
+                  onClick={() => {
+                    setSolutions(solutions.filter((_, i) => i !== idx));
+                  }}
+                >
+                  <X className=" mr-2" />
+                </Button>
+              </div>
+            );
+          })
+        ) : (
+          <h1>No solution found</h1>
+        )}
+
+        <Button
+          variant="ghost"
+          className="hover:bg-transparent p-0"
+          onClick={() => {
+            setSolutions([...solutions, { code: "" }]);
+          }}
+        >
+          <CirclePlus className="mr-2" />
+          Add Solution
+        </Button>
+      </div>
+
       <div className="space-y-2 mt-5">
-        <Label htmlFor="Description">Testcases</Label>
-        {testCases.map((testcase, idx) => {
-          return (
-            <div key={idx} className="flex gap-4 items-end">
-              <div>
-                <Label htmlFor={`input-${idx}`}>Input</Label>
-                <Input
-                  type="text"
-                  id={`input-${idx}`}
-                  name={`input-${idx}`}
-                  value={testcase.input}
-                  onChange={(e) =>
-                    handleTestCaseChange(idx, "input", e.target.value)
-                  }
-                  required
-                />
+        <Label htmlFor="Testcases">Testcases</Label>
+        {testCases.length > 0 ? (
+          testCases.map((testcase, idx) => {
+            return (
+              <div key={idx} className="flex gap-4 items-end ">
+                <div>
+                  <Label htmlFor={`input-${idx}`}>Input</Label>
+                  <Textarea
+                    id={`input-${idx}`}
+                    name={`input-${idx}`}
+                    value={unescapeCode(testcase.input!) || ""}
+                    onChange={(e) =>
+                      handleTestCaseChange(idx, "input", e.target.value)
+                    }
+                    rows={2}
+                    cols={50}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`output-${idx}`}>Output</Label>
+                  <Textarea
+                    id={`output-${idx}`}
+                    name={`output-${idx}`}
+                    value={unescapeCode(testcase.output!) || ""}
+                    onChange={(e) =>
+                      handleTestCaseChange(idx, "output", e.target.value)
+                    }
+                    rows={2}
+                    cols={50}
+                    required
+                  />
+                </div>
+                <Button
+                  variant="ghost"
+                  className="hover:bg-transparent p-0 m-0 flex self-end"
+                  onClick={() => removeTestCase(idx)}
+                  disabled={testCases.length === 1}
+                >
+                  <X className=" mr-2" />
+                </Button>
               </div>
-              <div>
-                <Label htmlFor={`output-${idx}`}>Output</Label>
-                <Input
-                  type="text"
-                  id={`output-${idx}`}
-                  name={`output-${idx}`}
-                  value={testcase.output}
-                  onChange={(e) =>
-                    handleTestCaseChange(idx, "output", e.target.value)
-                  }
-                  required
-                />
-              </div>
-              <Button
-                variant="ghost"
-                className="hover:bg-transparent p-0"
-                onClick={() => removeTestCase(idx)}
-                disabled={testCases.length === 1}
-              >
-                <X className="mr-2" />
-              </Button>
-            </div>
-          );
-        })}
+            );
+          })
+        ) : (
+          <h1>No Testcase found</h1>
+        )}
 
         <Button
           variant="ghost"

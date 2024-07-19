@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getAllProblemsWithTestcases } from "@/actions/problems";
+import { getAllProblemsWithTestcasesAndTopic } from "@/actions/problems";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -25,7 +25,7 @@ export default function AdminProblemPage() {
         <div>
           <h3 className="text-lg font-medium">Problem Board</h3>
           <p className="text-sm">
-            You can activate/deactivate and modify problems here.
+            You can activate/deactivate or modify problems here.
           </p>
         </div>
         <Button asChild>
@@ -38,7 +38,7 @@ export default function AdminProblemPage() {
 }
 
 async function ProblemsTable() {
-  const problems = (await getAllProblemsWithTestcases()) || [];
+  const problems = (await getAllProblemsWithTestcasesAndTopic()) || [];
 
   return (
     <>
@@ -50,7 +50,7 @@ async function ProblemsTable() {
                 <span className="sr-only">Available for Purchase</span>
               </TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>Concept</TableHead>
+              <TableHead>Topic</TableHead>
               <TableHead>Testcases</TableHead>
               <TableHead className="w-0">
                 <span className="sr-only">Actions</span>
@@ -75,7 +75,7 @@ async function ProblemsTable() {
                     )}
                   </TableCell>
                   <TableCell>{problem.name}</TableCell>
-                  <TableCell>$100</TableCell>
+                  <TableCell>{problem.topics[0].name}</TableCell>
                   <TableCell>{problem.testcases.length}</TableCell>
                   <TableCell>
                     <DropdownMenu>
