@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, Check, Code, X } from "lucide-react";
-import { Difficulty, List, Status } from "@repo/db";
+import { Difficulty, List, Status, Submission, Topic } from "@repo/db";
 import { Badge } from "@repo/ui/components/ui/badge";
 import { useMemo } from "react";
 
@@ -10,17 +10,12 @@ export type userProblemDetailsType = {
   id: string;
   name: string;
   difficulty: Difficulty;
-  topics: {
-    name: string;
-  }[];
+  topics: Topic[];
+  List: List[];
   hasUserSolved?: {
-    Submission: {
-      status: Status;
-      passedTestcases: number;
-      totalTestcases: number;
-    } | null;
+    Submission: Submission | null;
   }[];
-};
+}[];
 
 export function useGeneralColumns(): ColumnDef<userProblemDetailsType>[] {
   return useMemo(() => {
@@ -55,14 +50,14 @@ export function useGeneralColumns(): ColumnDef<userProblemDetailsType>[] {
         accessorKey: "name",
         header: ({ column }) => {
           return (
-            <div className="flex items-center">
-              <h1 className="cursor-default hover:bg-transparent">Problem</h1>
-              <ArrowUpDown
-                className="ml-2 h-3 w-3 cursor-pointer"
-                onClick={() => {
-                  column.toggleSorting();
-                }}
-              />
+            <div
+              className="flex items-center cursor-pointer w-fit"
+              onClick={() => {
+                column.toggleSorting();
+              }}
+            >
+              <h1>Problem</h1>
+              <ArrowUpDown className="ml-2 h-3 w-3 " />
             </div>
           );
         },
@@ -74,7 +69,15 @@ export function useGeneralColumns(): ColumnDef<userProblemDetailsType>[] {
       {
         accessorKey: "difficulty",
         header: ({ column }) => {
-          return <div className=" flex justify-center">Difficulty</div>;
+          return (
+            <div
+              className="flex items-center justify-center cursor-pointer"
+              onClick={() => column.toggleSorting()}
+            >
+              <h1>Difficulty</h1>
+              <ArrowUpDown className="ml-2 h-3 w-3 cursor-pointer" />
+            </div>
+          );
         },
         cell: ({ row }) => {
           const difficulty = row.getValue("difficulty") as Difficulty;
@@ -84,6 +87,14 @@ export function useGeneralColumns(): ColumnDef<userProblemDetailsType>[] {
             >
               {row.getValue("difficulty")}
             </Badge>
+          );
+        },
+
+        sortingFn: (a, b) => {
+          const difficultyOrder = ["Easy", "Medium", "Hard", "NA"];
+          return (
+            difficultyOrder.indexOf(a.getValue("difficulty")) -
+            difficultyOrder.indexOf(b.getValue("difficulty"))
           );
         },
       },
