@@ -15,9 +15,9 @@ model User {
   hasUserSolved hasUserSolved[]
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @default(now()) @updatedAt
-  Like          Like[]
-  Dislike       Dislike[]
-  SavedSolution SavedSolution[]
+  like          Like[]
+  dislike       Dislike[]
+  likedSolution LikedSolution[]
 }
 
 model Problem {
@@ -26,15 +26,15 @@ model Problem {
   difficulty            Difficulty      @default(NA)
   isActiveForSubmission Boolean         @default(true)
   starterCode           String
+  solutions             Solution[]
   bookmarks             Bookmark[]
   submissions           Submission[]
   testcases             Testcase[]
   topics                Topic[]
-  List                  List[]
+  lists                 List[]
   hasUserSolved         hasUserSolved[]
   createdAt             DateTime        @default(now())
   updatedAt             DateTime        @default(now()) @updatedAt
-  Solution              Solution[]
 
   @@index([name])
 }
@@ -43,7 +43,7 @@ model Bookmark {
   id        String   @id @default(uuid())
   User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  Problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
   problemId String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -56,11 +56,11 @@ model Bookmark {
 model Solution {
   id        String          @id @default(uuid())
   code      String
-  Problem   Problem         @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  problem   Problem         @relation(fields: [problemId], references: [id], onDelete: Cascade)
   problemId String
   likes     Like[]
   dislikes  Dislike[]
-  savedBy   SavedSolution[]
+  savedBy   LikedSolution[]
   createdAt DateTime        @default(now())
   updatedAt DateTime        @default(now()) @updatedAt
 
@@ -69,9 +69,9 @@ model Solution {
 
 model Like {
   id         String   @id @default(uuid())
-  User       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
-  Solution   Solution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
+  solution   Solution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
   solutionId String
   createdAt  DateTime @default(now())
 
@@ -82,9 +82,9 @@ model Like {
 
 model Dislike {
   id         String   @id @default(uuid())
-  User       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
-  Solution   Solution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
+  solution   Solution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
   solutionId String
   createdAt  DateTime @default(now())
 
@@ -93,11 +93,11 @@ model Dislike {
   @@index([solutionId])
 }
 
-model SavedSolution {
+model LikedSolution {
   id         String   @id @default(uuid())
-  User       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
-  Solution   Solution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
+  solution   Solution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
   solutionId String
   createdAt  DateTime @default(now())
 
@@ -109,9 +109,9 @@ model SavedSolution {
 model Submission {
   id              String          @id @default(uuid())
   status          Status          @default(Pending)
-  User            User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId          String
-  Problem         Problem?        @relation(fields: [problemId], references: [id])
+  problem         Problem?        @relation(fields: [problemId], references: [id])
   problemId       String
   testcaseResults Json?
   passedTestcases Int
@@ -128,9 +128,9 @@ model hasUserSolved {
   id           String      @id @default(uuid())
   Submission   Submission? @relation(fields: [submissionId], references: [id], onDelete: Cascade)
   submissionId String?
-  User         User?       @relation(fields: [userId], references: [id])
+  user         User?       @relation(fields: [userId], references: [id])
   userId       String?
-  Problem      Problem?    @relation(fields: [problemId], references: [id])
+  problem      Problem?    @relation(fields: [problemId], references: [id])
   problemId    String?
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @default(now()) @updatedAt
@@ -144,7 +144,7 @@ model Testcase {
   id        String   @id @default(uuid())
   input     String
   output    String
-  Problem   Problem? @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  problem   Problem? @relation(fields: [problemId], references: [id], onDelete: Cascade)
   problemId String?
 }
 
@@ -163,18 +163,18 @@ enum Difficulty {
 }
 
 model Topic {
-  id      String    @id @default(uuid())
-  name    String
-  problem Problem[]
-  List    List?     @relation(fields: [listId], references: [id], onDelete: Restrict)
-  listId  String?
+  id       String    @id @default(uuid())
+  name     String
+  problems Problem[]
+  List     List?     @relation(fields: [listId], references: [id], onDelete: Restrict)
+  listId   String?
 }
 
 model List {
-  id      String       @id @default(uuid())
-  name    PopularLists @default(Common)
-  problem Problem[]
-  topic   Topic[]
+  id       String       @id @default(uuid())
+  name     PopularLists @default(Common)
+  problems Problem[]
+  topics   Topic[]
 }
 
 enum PopularLists {
