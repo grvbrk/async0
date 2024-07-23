@@ -1,16 +1,10 @@
 "use server";
 
-import { Difficulty } from "@repo/db";
 import axios from "axios";
 import { cache } from "react";
-import { duplicateInteger, isAnagram } from "@repo/common/driver/driver-code";
-import { judge0TokenResponseType } from "@repo/common";
+import { judge0TokenResponseType, problemDriverCode } from "@repo/common";
 import { DisplayProblemPropType } from "../problems/[problemName]/_components/DisplayProblem";
-
-const problemTable: Record<string, any> = {
-  duplicateinteger: duplicateInteger,
-  isanagram: isAnagram,
-};
+import { runCode } from "./runCode";
 
 export const codeSubmission = cache(
   async (
@@ -19,17 +13,12 @@ export const codeSubmission = cache(
     problemName: string,
     run: boolean
   ) => {
-    const batchSubmission = problemTable[problemName](
-      code,
-      problem?.testcases || [],
-      run
-    );
-    console.log("CODE", code);
     if (run) {
+      const submission = runCode(code);
       try {
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_JUDGE0_URL}/submissions/?base64_encoded=false`,
-          JSON.stringify(batchSubmission),
+          JSON.stringify(submission),
           { headers: { "Content-Type": "application/json" } }
         );
         return await checkPromiseStatus(response.data.token);
@@ -37,6 +26,11 @@ export const codeSubmission = cache(
         console.log("Error submitting RUN code");
       }
     } else {
+      const batchSubmission = problemDriverCode[problemName](
+        code,
+        problem?.testcases || [],
+        run
+      );
       try {
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_JUDGE0_URL}/submissions/batch?base64_encoded=false`,
@@ -54,7 +48,7 @@ export const codeSubmission = cache(
             await Promise.allSettled(
               tokens.map((token) => checkPromiseStatus(token))
             );
-
+          // console.log(responses[0].value.status);
           return responses;
         }
       } catch (error) {
@@ -64,7 +58,9 @@ export const codeSubmission = cache(
   }
 );
 
-function checkPromiseStatus(token: string): Promise<judge0TokenResponseType> {
+export async function checkPromiseStatus(
+  token: string
+): Promise<judge0TokenResponseType> {
   return new Promise((resolve) => {
     async function checkStatus() {
       const response = await axios.get(
