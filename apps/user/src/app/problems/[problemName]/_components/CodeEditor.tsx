@@ -408,6 +408,7 @@ function ShowResults({
 }
 
 function ShowRunConsole(problem: any) {
+  console.log(problem);
   return (
     <>
       <pre className="text-sm text-muted-foreground mt-2 text-wrap">

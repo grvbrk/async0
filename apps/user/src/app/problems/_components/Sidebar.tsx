@@ -58,7 +58,7 @@ function Sidebar() {
                   </div>
                   <div className="flex ml-auto items-center justify-center gap-1 text-muted-foreground">
                     <User className="h-4 w-4" />
-                    <div className="text-sm">{session.user.email}</div>
+                    <div className="text-sm">{session.user.name}</div>
                   </div>
                 </SheetTitle>
                 <Progress className="mt-1" value={80} />
@@ -93,24 +93,26 @@ function Sidebar() {
                       </div>
                     </AccordionTrigger>
                     <AccordionContent className="flex flex-col gap-2 pl-6 mb-2 text-muted-foreground">
-                      {topic && topic.problem.length > 0 ? (
-                        topic.problem.map((problem: Problem, index: number) => {
-                          return (
-                            <div
-                              key={index}
-                              className="flex gap-2 items-center"
-                            >
-                              <Binary className="w-4 h-4 text-primary" />
-                              <Link
-                                href={`/problems/${problem.name.replace(/\s+/g, "-")}`}
-                                className="hover:text-primary flex items-center gap-2 "
+                      {topic && topic.problems.length > 0 ? (
+                        topic.problems.map(
+                          (problem: Problem, index: number) => {
+                            return (
+                              <div
+                                key={index}
+                                className="flex gap-2 items-center"
                               >
-                                {problem.name}
-                                <ExternalLink className="w-3 h-3 text-muted-foreground" />
-                              </Link>
-                            </div>
-                          );
-                        })
+                                <Binary className="w-4 h-4 text-primary" />
+                                <Link
+                                  href={`/problems/${problem.name.replace(/\s+/g, "-")}`}
+                                  className="hover:text-primary flex items-center gap-2 "
+                                >
+                                  {problem.name}
+                                  <ExternalLink className="w-3 h-3 text-muted-foreground" />
+                                </Link>
+                              </div>
+                            );
+                          }
+                        )
                       ) : (
                         <h1>No problem found</h1>
                       )}

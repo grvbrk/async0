@@ -21,7 +21,7 @@ import { unescapeCode } from "@repo/common";
 import AnimatePanel from "./AnimatePanel";
 import ProblemInfoCard from "./ProblemInfoCard";
 import ProblemSolutionCard from "./ProblemSolutionCard";
-import { Bookmark, Problem, Solution, Testcase } from "@repo/db";
+import { Bookmark, Solution, Testcase } from "@repo/db";
 
 export type SolutionWithCounts = Solution & {
   _count: {
@@ -40,9 +40,10 @@ export type DisplayProblemPropType =
   | {
       id: string;
       name: string;
+      link: string;
       difficulty: string;
       starterCode: string;
-      Solution: SolutionWithCounts[];
+      solutions: SolutionWithCounts[];
       testcases: Testcase[];
       bookmarks?: Bookmark[];
     }

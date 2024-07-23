@@ -1,23 +1,48 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, Check, Code, X } from "lucide-react";
-import { Difficulty, List, Status, Submission, Topic } from "@repo/db";
+import { ArrowUpDown, Bookmark, Check, Code, X } from "lucide-react";
+import type {
+  Bookmark as BookmarkType,
+  Difficulty,
+  List,
+  Solution,
+  Status,
+  Topic,
+} from "@repo/db";
 import { Badge } from "@repo/ui/components/ui/badge";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { toggleBookmark } from "../actions/bookmarks";
+import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 
 export type userProblemDetailsType = {
   id: string;
   name: string;
+  link: string | null;
   difficulty: Difficulty;
-  topics: Topic[];
-  List: List[];
+  topics: { name: string }[];
+  lists: List[];
   hasUserSolved?: {
-    Submission: Submission | null;
+    id: string;
+    submissionId: string | null;
+    userId: string | null;
+    problemId: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    Submission?: {
+      status: Status;
+      passedTestcases: number;
+      totalTestcases: number;
+    } | null;
   }[];
+  bookmarks?: BookmarkType[];
+  solutions: Solution[];
 }[];
 
-export function useGeneralColumns(): ColumnDef<userProblemDetailsType>[] {
+export function useUserProblemColumns(): ColumnDef<userProblemDetailsType>[] {
+  const { data: session } = useSession();
+  const user: any = session?.user;
   return useMemo(() => {
     const columns: ColumnDef<userProblemDetailsType>[] = [
       {
@@ -26,26 +51,72 @@ export function useGeneralColumns(): ColumnDef<userProblemDetailsType>[] {
           return <div className="flex justify-center">Status</div>;
         },
         cell: ({ row }) => {
-          const hasUserSolved = row.getValue("hasUserSolved") as {
+          const userSolvedStatus = row.getValue("hasUserSolved") as {
             Submission: {
               status: Status;
               passedTestcases: number;
               totalTestcases: number;
             };
           };
-          const isSolved = hasUserSolved?.Submission?.status === "Accepted";
+          const isSolved = userSolvedStatus?.Submission?.status === "Accepted";
 
           return (
             <div className="flex justify-center">
               {isSolved ? (
                 <Check className="text-green-600" />
               ) : (
-                <Code className="text-muted-foreground size-5" />
+                <Code className=" size-5" />
               )}
             </div>
           );
         },
+        size: 50,
       },
+
+      {
+        accessorKey: "bookmarks",
+        header: ({ column }) => {
+          return <div className="flex justify-center">Bookmark</div>;
+        },
+        cell: ({ row }) => {
+          const problemData =
+            row.original as unknown as userProblemDetailsType[0];
+          const [isBookmarked, setIsBookmarked] = useState<boolean>(
+            problemData.bookmarks?.length! > 0
+          );
+          return (
+            <div className="flex justify-center">
+              <Bookmark
+                size={16}
+                className={`${user && isBookmarked && "fill-primary text-primary"}`}
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  if (user) {
+                    setIsBookmarked(!isBookmarked);
+                    const result = await toggleBookmark(problemData.id);
+                    if (result === false || undefined) {
+                      setIsBookmarked(false);
+                    } else setIsBookmarked(true);
+                  } else {
+                    toast.error(
+                      "You need to login before bookmarking problems"
+                    );
+                    return;
+                  }
+                }}
+              />
+            </div>
+          );
+        },
+        filterFn: (row, columnId, filterValue) => {
+          //@ts-ignore
+          const userBookmarks = row.getValue(columnId) as BookmarkType[];
+          const isBookmarked = userBookmarks.length > 0;
+          return filterValue ? isBookmarked : true;
+        },
+        size: 50,
+      },
+
       {
         accessorKey: "name",
         header: ({ column }) => {
@@ -63,8 +134,26 @@ export function useGeneralColumns(): ColumnDef<userProblemDetailsType>[] {
         },
         cell: ({ row }) => {
           const problemName = row.getValue("name") as string;
-          return <div className="text-muted-foreground"> {problemName} </div>;
+          return <div> {problemName} </div>;
         },
+        size: 200,
+      },
+      {
+        accessorKey: "solutions",
+        header: ({ column }) => {
+          return (
+            <div className="flex justify-center cursor-pointer ">
+              <h1>Solutions</h1>
+            </div>
+          );
+        },
+        cell: ({ row }) => {
+          const solutionArray = row.getValue("solutions") as Solution[];
+          return (
+            <div className="flex justify-center"> {solutionArray.length} </div>
+          );
+        },
+        size: 100,
       },
       {
         accessorKey: "difficulty",
@@ -82,14 +171,15 @@ export function useGeneralColumns(): ColumnDef<userProblemDetailsType>[] {
         cell: ({ row }) => {
           const difficulty = row.getValue("difficulty") as Difficulty;
           return (
-            <Badge
-              className={`${difficulty === "Easy" ? "text-background bg-green-600" : difficulty === "Medium" ? "text-background bg-yellow-600" : "text-background bg-red-600"} flex justify-center`}
-            >
-              {row.getValue("difficulty")}
-            </Badge>
+            <div className="flex self-center justify-center">
+              <Badge
+                className={`${difficulty === "Easy" ? "text-background bg-green-600" : difficulty === "Medium" ? "text-background bg-yellow-600" : "text-background bg-red-600"} w-20 flex justify-center`}
+              >
+                {row.getValue("difficulty")}
+              </Badge>
+            </div>
           );
         },
-
         sortingFn: (a, b) => {
           const difficultyOrder = ["Easy", "Medium", "Hard", "NA"];
           return (
@@ -97,36 +187,41 @@ export function useGeneralColumns(): ColumnDef<userProblemDetailsType>[] {
             difficultyOrder.indexOf(b.getValue("difficulty"))
           );
         },
+        size: 100,
       },
-
       {
         accessorKey: "topics",
         header: ({ column }) => {
           return <div className="flex justify-center">Topic</div>;
         },
         cell: ({ row }) => {
-          const topics = row.getValue("topics") as [{ name: string }];
+          const topicList = row.getValue("topics") as Topic[];
           return (
-            <div className="text-muted-foreground flex justify-center">
-              {" "}
-              {topics[0].name}{" "}
+            <div className=" flex justify-center text-center ">
+              {topicList[0].name}
             </div>
           );
         },
+        filterFn: (row, columnId, filterValue) => {
+          const topics = row.getValue(columnId) as Topic[];
+          return topics.some((topic) => topic.name === filterValue);
+        },
+        size: 100,
       },
       {
-        accessorKey: "List",
+        accessorKey: "lists",
         header: ({ column }) => {
           return <div className=" flex justify-center">List</div>;
         },
         cell: ({ row }) => {
-          const list = row.getValue("List") as [List];
-          return (
-            <div className="text-muted-foreground flex justify-center">
-              {list[0].name}
-            </div>
-          );
+          const lists = row.getValue("lists") as List[];
+          return <div className=" flex justify-center">{lists[0].name}</div>;
         },
+        filterFn: (row, columnId, filterValue) => {
+          const lists = row.getValue(columnId) as List[];
+          return lists.some((list) => list.name === filterValue);
+        },
+        size: 100,
       },
     ];
 

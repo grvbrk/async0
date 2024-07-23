@@ -31,7 +31,7 @@ export default function ProblemSolutionCard({
   const { theme } = useTheme();
   const [optimisticSolutions, setOptimisticSolutions] = useOptimistic<
     SolutionWithCounts[]
-  >(problem?.Solution ?? []);
+  >(problem?.solutions ?? []);
   const [isPending, startTransition] = useTransition();
 
   async function handleLikeToggle(solutionId: string) {
@@ -55,7 +55,7 @@ export default function ProblemSolutionCard({
       setOptimisticSolutions(newOptimisticSolutions);
 
       try {
-        await toggleSolutionLikes(solutionId, user);
+        await toggleSolutionLikes(solutionId);
       } catch (error) {
         toast.error("Failed to update. Please try again.");
         setOptimisticSolutions(optimisticSolutions);
@@ -86,7 +86,7 @@ export default function ProblemSolutionCard({
       setOptimisticSolutions(newOptimisticSolutions);
 
       try {
-        await toggleSolutionDislikes(solutionId, user);
+        await toggleSolutionDislikes(solutionId);
       } catch (error) {
         toast.error("Failed to update. Please try again.");
         setOptimisticSolutions(optimisticSolutions);
@@ -111,7 +111,7 @@ export default function ProblemSolutionCard({
       setOptimisticSolutions(newOptimisticSolutions);
 
       try {
-        await toggleSolutionSave(solutionId, user as any);
+        await toggleSolutionSave(solutionId);
       } catch (error) {
         toast.error("Failed to update. Please try again.");
         setOptimisticSolutions(optimisticSolutions);
@@ -128,7 +128,7 @@ export default function ProblemSolutionCard({
           <CardHeader>
             <CardTitle className="flex items-center">Approaches</CardTitle>
             <CardDescription>
-              {problem.Solution.length > 0 ? (
+              {problem.solutions.length > 0 ? (
                 <>
                   <p className="mb-4 flex flex-col gap-2">
                     Some approaches which I find intuitive.

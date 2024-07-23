@@ -13,11 +13,11 @@ import { DisplayProblemPropType } from "./DisplayProblem";
 import { problemDescriptions } from "@repo/common";
 import { Badge } from "@repo/ui/components/ui/badge";
 import { useTheme } from "next-themes";
-import { Bookmark } from "lucide-react";
+import { Bookmark, ExternalLink } from "lucide-react";
 import { toggleBookmark } from "@/app/actions/bookmarks";
 import { useSession } from "next-auth/react";
-import { DefaultUser } from "next-auth";
 import { Skeleton } from "@repo/ui/components/ui/skeleton";
+import Link from "next/link";
 
 type ProblemInfoCardProps = {
   problem: DisplayProblemPropType;
@@ -61,7 +61,6 @@ export default function ProblemInfoCard({
         </CardContent>
       </Card>
     );
-
   return (
     <Card className="h-[75vh] overflow-y-auto ">
       {problem ? (
@@ -69,15 +68,21 @@ export default function ProblemInfoCard({
           <CardHeader>
             <CardTitle className="flex items-center mb-2 ">
               <div className="text-2xl font-extrabold">{problem.name}</div>
+              <Link
+                href={problem.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="cursor-pointer ml-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </Link>
+
               {session && (
                 <Bookmark
-                  className={`h-5 w-5 ml-4 hover:text-primary hover:cursor-pointer mt-1 ${isBookmarked && "fill-primary"}`}
+                  className={`h-5 w-5 ml-4 hover:text-primary hover:cursor-pointer ${isBookmarked && "fill-primary"}`}
                   onClick={async () => {
                     setIsBookmarked(!isBookmarked);
-                    const result = await toggleBookmark(
-                      session?.user as DefaultUser,
-                      problem.id
-                    );
+                    const result = await toggleBookmark(problem.id);
                     if (result === false || undefined) {
                       setIsBookmarked(false);
                     } else setIsBookmarked(true);
