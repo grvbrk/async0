@@ -69,7 +69,7 @@ export default function ProblemInfoCard({
             <CardTitle className="flex items-center mb-2 ">
               <div className="text-2xl font-extrabold">{problem.name}</div>
               <Link
-                href={problem.link}
+                href={problem.link || "#"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="cursor-pointer ml-2"

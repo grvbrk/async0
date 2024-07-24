@@ -40,7 +40,7 @@ export type DisplayProblemPropType =
   | {
       id: string;
       name: string;
-      link: string;
+      link: string | null;
       difficulty: string;
       starterCode: string;
       solutions: SolutionWithCounts[];
