@@ -2,7 +2,7 @@
 
 import { cache } from "react";
 import prisma from "@repo/db";
-import { DefaultUser, getServerSession } from "next-auth";
+import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 
 export const getAllGeneralProblems = cache(async () => {
