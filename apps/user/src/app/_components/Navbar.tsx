@@ -32,6 +32,11 @@ import Sidebar from "../problems/_components/Sidebar";
 import { useTheme } from "next-themes";
 import { Switch } from "@repo/ui/components/ui/switch";
 import { Skeleton } from "@repo/ui/components/ui/skeleton";
+import { useDebounce } from "../hooks/useDebounce";
+import { MAX_QUERY_LENGTH } from "@/lib/utils";
+import { toast } from "sonner";
+import { searchProblemQuery } from "../actions/search";
+import SearchDisplay from "./SearchDisplay";
 
 type ProvidersResponse = Record<
   LiteralUnion<BuiltInProviderType, string>,
@@ -45,16 +50,33 @@ export default function Navbar() {
   const [providers, setProviders] = useState<ProvidersResponse | null>(null);
   const [mounted, setMounted] = useState(false);
   const [auth0Authenticated, setAuth0Authenticated] = useState(false);
+  const [text, setText] = useState<string>("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const debouncedText = useDebounce(text, 0.5);
+  const [showCard, setShowCard] = useState<boolean>(false);
 
   useEffect(() => {
-    async function setAuthProviders() {
-      const response = (await getProviders()) as ProvidersResponse;
-      setProviders(response);
+    async function fetchData() {
+      if (debouncedText.length >= 0) {
+        try {
+          const results = await searchProblemQuery(debouncedText);
+          setSearchResults(results as any[]);
+        } catch (error) {
+          console.error("Error searching problems:", error);
+        }
+      }
+      try {
+        const response = await getProviders();
+        setProviders(response);
+      } catch (error) {
+        console.error("Error getting providers:", error);
+      }
+
+      setMounted(true);
     }
 
-    setAuthProviders();
-    setMounted(true);
-  }, []);
+    fetchData();
+  }, [debouncedText]);
 
   if (!mounted || status === "loading")
     return (
@@ -88,7 +110,7 @@ export default function Navbar() {
 
           <Link
             href="/"
-            className={`hidden md:block font-black text-foreground transition-colors hover:text-primary ${pathname === "/" && "text-primary"}`}
+            className={` md:block font-black text-foreground transition-colors hover:text-primary ${pathname === "/" && "text-primary"}`}
           >
             Async0
           </Link>
@@ -104,19 +126,50 @@ export default function Navbar() {
             href="/neetcode"
             className={`hidden md:block text-muted-foreground transition-colors hover:text-primary ${pathname === "/neetcode" && " text-primary"}`}
           >
-            Neetcode 150
+            Neetcode
           </Link>
         </nav>
-        <form className=" ml-auto flex-1 sm:flex-initial">
-          <div className="relative">
+        <div className="ml-auto flex-1 sm:flex-initial relative">
+          <div
+            className="relative"
+            onFocus={() => setShowCard(true)}
+            onBlur={(e) => {
+              if (!e.currentTarget.contains(e.relatedTarget)) {
+                const isLinkClick =
+                  e.relatedTarget && e.relatedTarget.tagName === "A";
+                if (!isLinkClick) {
+                  setShowCard(false);
+                } else {
+                  setTimeout(() => {
+                    setShowCard(false);
+                  }, 100);
+                }
+              }
+            }}
+          >
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search problem..."
-              className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
+              className="pl-8 sm:w-[400px] md:w-[300px] lg:w-[450px]"
+              onChange={(e) => {
+                let text = e.target.value;
+                setShowCard(text.length > 0);
+                if (text.length >= MAX_QUERY_LENGTH) {
+                  e.target.value = e.target.value.slice(0, MAX_QUERY_LENGTH);
+                  toast.error("Max query length reached");
+                } else {
+                  setText(text);
+                }
+              }}
             />
           </div>
-        </form>
+          {showCard && (
+            <div className="absolute mt-3 w-full sm:w-[400px] md:w-[300px] lg:w-[450px]">
+              <SearchDisplay searchResults={searchResults} />
+            </div>
+          )}
+        </div>
 
         <Switch
           id="toggleMode"
