@@ -10,43 +10,46 @@ datasource db {
 model User {
   id            String          @id @default(uuid())
   email         String          @unique
-  bookmarks     Bookmark[]
-  submissions   Submission[]
-  hasUserSolved hasUserSolved[]
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @default(now()) @updatedAt
-  like          Like[]
+  bookmarks     Bookmark[]
   dislike       Dislike[]
+  like          Like[]
   likedSolution LikedSolution[]
+  submissions   Submission[]
+  hasUserSolved hasUserSolved[]
 }
 
 model Problem {
-  id                    String          @id @default(uuid())
+  id                    String                   @id @default(uuid())
   name                  String
-  difficulty            Difficulty      @default(NA)
-  isActiveForSubmission Boolean         @default(true)
+  difficulty            Difficulty               @default(NA)
+  isActiveForSubmission Boolean                  @default(true)
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @default(now()) @updatedAt
   starterCode           String
-  solutions             Solution[]
+  link                  String?
+  search_vector         Unsupported("tsvector")?
   bookmarks             Bookmark[]
+  solutions             Solution[]
   submissions           Submission[]
   testcases             Testcase[]
-  topics                Topic[]
-  lists                 List[]
   hasUserSolved         hasUserSolved[]
-  createdAt             DateTime        @default(now())
-  updatedAt             DateTime        @default(now()) @updatedAt
+  lists                 List[]                   @relation("ListToProblem")
+  topics                Topic[]                  @relation("ProblemToTopic")
 
   @@index([name])
+  @@index([search_vector], map: "problem_search_idx", type: Gin)
 }
 
 model Bookmark {
   id        String   @id @default(uuid())
-  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
   problemId String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+  problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, problemId])
   @@index([userId])
@@ -56,24 +59,24 @@ model Bookmark {
 model Solution {
   id        String          @id @default(uuid())
   code      String
-  problem   Problem         @relation(fields: [problemId], references: [id], onDelete: Cascade)
   problemId String
-  likes     Like[]
-  dislikes  Dislike[]
-  savedBy   LikedSolution[]
   createdAt DateTime        @default(now())
   updatedAt DateTime        @default(now()) @updatedAt
+  dislikes  Dislike[]
+  likes     Like[]
+  savedBy   LikedSolution[]
+  problem   Problem         @relation(fields: [problemId], references: [id], onDelete: Cascade)
 
   @@index([problemId])
 }
 
 model Like {
   id         String   @id @default(uuid())
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
-  solution   Solution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
   solutionId String
   createdAt  DateTime @default(now())
+  solution   Solution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, solutionId])
   @@index([userId])
@@ -82,11 +85,11 @@ model Like {
 
 model Dislike {
   id         String   @id @default(uuid())
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
-  solution   Solution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
   solutionId String
   createdAt  DateTime @default(now())
+  solution   Solution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, solutionId])
   @@index([userId])
@@ -95,11 +98,11 @@ model Dislike {
 
 model LikedSolution {
   id         String   @id @default(uuid())
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
-  solution   Solution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
   solutionId String
   createdAt  DateTime @default(now())
+  solution   Solution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, solutionId])
   @@index([userId])
@@ -109,16 +112,16 @@ model LikedSolution {
 model Submission {
   id              String          @id @default(uuid())
   status          Status          @default(Pending)
-  user            User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId          String
-  problem         Problem?        @relation(fields: [problemId], references: [id])
   problemId       String
-  testcaseResults Json?
-  passedTestcases Int
-  totalTestcases  Int
-  hasUserSolved   hasUserSolved[]
   createdAt       DateTime        @default(now())
+  passedTestcases Int
+  testcaseResults Json?
+  totalTestcases  Int
   updatedAt       DateTime        @default(now()) @updatedAt
+  problem         Problem         @relation(fields: [problemId], references: [id])
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hasUserSolved   hasUserSolved[]
 
   @@index([userId])
   @@index([problemId])
@@ -126,14 +129,14 @@ model Submission {
 
 model hasUserSolved {
   id           String      @id @default(uuid())
-  Submission   Submission? @relation(fields: [submissionId], references: [id], onDelete: Cascade)
   submissionId String?
-  user         User?       @relation(fields: [userId], references: [id])
   userId       String?
-  problem      Problem?    @relation(fields: [problemId], references: [id])
   problemId    String?
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @default(now()) @updatedAt
+  problem      Problem?    @relation(fields: [problemId], references: [id])
+  Submission   Submission? @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  user         User?       @relation(fields: [userId], references: [id])
 
   @@unique([submissionId, userId, problemId])
   @@index([userId])
@@ -142,10 +145,25 @@ model hasUserSolved {
 
 model Testcase {
   id        String   @id @default(uuid())
+  problemId String?
   input     String
   output    String
   problem   Problem? @relation(fields: [problemId], references: [id], onDelete: Cascade)
-  problemId String?
+}
+
+model Topic {
+  id       String    @id @default(uuid())
+  name     String
+  listId   String?
+  List     List?     @relation(fields: [listId], references: [id], onDelete: Restrict)
+  problems Problem[] @relation("ProblemToTopic")
+}
+
+model List {
+  id       String       @id @default(uuid())
+  name     PopularLists @default(Common)
+  topics   Topic[]
+  problems Problem[]    @relation("ListToProblem")
 }
 
 enum Status {
@@ -160,21 +178,6 @@ enum Difficulty {
   Medium
   Hard
   NA
-}
-
-model Topic {
-  id       String    @id @default(uuid())
-  name     String
-  problems Problem[]
-  List     List?     @relation(fields: [listId], references: [id], onDelete: Restrict)
-  listId   String?
-}
-
-model List {
-  id       String       @id @default(uuid())
-  name     PopularLists @default(Common)
-  problems Problem[]
-  topics   Topic[]
 }
 
 enum PopularLists {
