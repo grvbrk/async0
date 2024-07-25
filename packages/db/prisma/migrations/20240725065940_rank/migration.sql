@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Solution" ADD COLUMN     "rank" INTEGER NOT NULL DEFAULT 1;
