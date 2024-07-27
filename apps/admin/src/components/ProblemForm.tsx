@@ -25,10 +25,10 @@ import { unescapeCode } from "@repo/common";
 
 type ProblemFormType = {
   problem?: {
-    List: List[];
+    lists: List[];
     topics: Topic[];
     testcases: Testcase[];
-    Solution: Solution[];
+    solutions: Solution[];
   } & Problem;
   lists?: List[];
   topics?: Topic[];
@@ -46,7 +46,7 @@ export default function ProblemForm({
   );
 
   const [solutions, setSolutions] = useState<Partial<Solution>[]>(
-    problem?.Solution || []
+    problem?.solutions || []
   );
   const [testCases, setTestCases] = useState<Partial<Testcase>[]>(
     problem?.testcases.map((tc) => ({
@@ -58,7 +58,7 @@ export default function ProblemForm({
     problem?.difficulty || ""
   );
   const [selectedList, setSelectedList] = useState<string>(
-    problem?.List[0]?.name || ""
+    problem?.lists[0]?.name || ""
   );
   const [selectedTopic, setSelectedTopic] = useState<string>(
     problem?.topics[0].name || ""
@@ -156,6 +156,17 @@ export default function ProblemForm({
             })}
           </SelectContent>
         </Select>
+      </div>
+
+      <div className="space-y-2 mt-5">
+        <Label htmlFor="link">Problem Link</Label>
+        <Input
+          type="link"
+          id="link"
+          name="link"
+          defaultValue={problem?.link || ""}
+          required
+        />
       </div>
 
       <div className="space-y-2 mt-5">
