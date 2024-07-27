@@ -12,9 +12,15 @@ export default async function EditProductPage({
 }) {
   const listsPromise = getAllLists();
   const topicsPromise = getAllTopics();
+
   const problemPromise = prisma.problem.findUnique({
     where: { id: problemId },
-    include: { testcases: true, List: true, topics: true, Solution: true },
+    include: {
+      testcases: true,
+      lists: true,
+      topics: true,
+      solutions: true,
+    },
   });
 
   const [lists, topics, problem] = await Promise.all([
@@ -22,7 +28,6 @@ export default async function EditProductPage({
     topicsPromise,
     problemPromise,
   ]);
-
   return (
     <>
       <div className="mb-4">
