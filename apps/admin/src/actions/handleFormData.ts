@@ -5,6 +5,7 @@ import { Difficulty, PopularLists } from "@repo/db";
 export async function addOneProblem(prevState: unknown, formData: FormData) {
   const data = Object.fromEntries(formData.entries());
   const testcases: { input: string; output: string }[] = [];
+  const solutions: string[] = [];
 
   for (let key in data) {
     if (key.startsWith("input")) {
@@ -21,8 +22,14 @@ export async function addOneProblem(prevState: unknown, formData: FormData) {
     if (key.startsWith("$ACTION")) {
       delete data[key];
     }
+    if (key.startsWith("solution")) {
+      solutions.push(String(data[key]));
+      delete data[key];
+    }
   }
+  console.log(data);
   const name = data.name as string;
+  const link = data.link as string;
   const difficulty = data.difficulty as Difficulty;
   const listName = data.list as PopularLists;
   const topicName = data.topic as string;
@@ -31,9 +38,11 @@ export async function addOneProblem(prevState: unknown, formData: FormData) {
   try {
     await addProblem(
       name,
+      link,
       difficulty,
       starterCode,
       testcases,
+      solutions,
       topicName,
       listName
     );
@@ -74,6 +83,7 @@ export async function updateOneProblem(
   }
 
   const name = data.name as string;
+  const link = data.link as string;
   const difficulty = data.difficulty as Difficulty;
   const listName = data.list as PopularLists;
   const topicName = data.topic as string;
@@ -82,6 +92,7 @@ export async function updateOneProblem(
     await updateProblem(
       id,
       name,
+      link,
       difficulty,
       starterCode,
       testcases,

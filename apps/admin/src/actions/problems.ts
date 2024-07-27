@@ -9,9 +9,11 @@ import { redirect } from "next/navigation";
 export const addProblem = cache(
   async (
     name: string,
+    link: string,
     difficulty: Difficulty,
     starterCode: string,
     testcases: { input: string; output: string }[],
+    solutions: string[],
     topicName: string,
     listName: PopularLists
   ) => {
@@ -34,13 +36,20 @@ export const addProblem = cache(
       await prisma.problem.create({
         data: {
           name,
+          link,
           difficulty,
           starterCode,
+          solutions: {
+            create: solutions.map((solution, index) => ({
+              code: solution,
+              rank: index,
+            })),
+          },
           testcases: { create: testcases },
           topics: {
             connect: [{ id: topic.id }],
           },
-          List: {
+          lists: {
             connect: [{ id: list.id }],
           },
         },
@@ -60,6 +69,7 @@ export const updateProblem = cache(
   async (
     id: string,
     name: string,
+    link: string,
     difficulty: Difficulty,
     starterCode: string,
     testcases: { input: string; output: string }[],
@@ -88,15 +98,19 @@ export const updateProblem = cache(
         where: { id },
         data: {
           name,
+          link,
           difficulty,
           starterCode,
           testcases: { deleteMany: {}, create: testcases },
-          Solution: {
+          solutions: {
             deleteMany: {},
-            create: solutions.map((solution) => ({ code: solution })),
+            create: solutions.map((solution, index) => ({
+              code: solution,
+              rank: index,
+            })),
           },
           topics: { set: [], connect: [{ id: topic.id }] },
-          List: { set: [], connect: [{ id: list.id }] },
+          lists: { set: [], connect: [{ id: list.id }] },
         },
       });
     } catch (error) {
@@ -113,7 +127,7 @@ export const updateProblem = cache(
 export const getAllProblemsWithTestcasesAndTopic = cache(async () => {
   try {
     const problems = await prisma.problem.findMany({
-      include: { testcases: true, topics: true, List: true },
+      include: { testcases: true, topics: true, lists: true },
     });
     return problems;
   } catch (error) {
