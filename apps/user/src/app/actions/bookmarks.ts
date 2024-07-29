@@ -38,9 +38,9 @@ export const toggleBookmark = cache(async (problemId: string) => {
   } catch (error) {
     console.log("ERROR ADDING BOOKMARK", error);
   }
-  revalidatePath("/problems", "layout");
-  revalidatePath("/neetcode", "layout");
-  revalidatePath("/problems/[problemName]", "layout");
+  revalidatePath("/problems");
+  revalidatePath("/neetcode");
+  revalidatePath("/problems/[problemName]");
 });
 
 // function wait(ms: number) {

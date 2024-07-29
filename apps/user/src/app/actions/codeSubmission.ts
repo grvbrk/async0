@@ -8,13 +8,13 @@ import { runCode } from "./runCode";
 
 export const codeSubmission = cache(
   async (
-    code: string,
+    userFunction: string,
     problem: DisplayProblemPropType,
     problemName: string,
     run: boolean
   ) => {
     if (run) {
-      const submission = runCode(code);
+      const submission = runCode(userFunction);
       try {
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_JUDGE0_URL}/submissions/?base64_encoded=false`,
@@ -27,9 +27,8 @@ export const codeSubmission = cache(
       }
     } else {
       const batchSubmission = problemDriverCode[problemName](
-        code,
-        problem?.testcases || [],
-        run
+        userFunction,
+        problem?.testcases || []
       );
       try {
         const response = await axios.post(
@@ -48,7 +47,6 @@ export const codeSubmission = cache(
             await Promise.allSettled(
               tokens.map((token) => checkPromiseStatus(token))
             );
-          // console.log(responses[0].value.status);
           return responses;
         }
       } catch (error) {

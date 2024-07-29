@@ -1,10 +1,60 @@
 "use server";
 
 import { cache } from "react";
-import prisma from "@repo/db";
+import prisma, { Solution } from "@repo/db";
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/authOptions";
+
+export const getAllSavedSolutions = cache(async () => {
+  const session = await getServerSession(authOptions);
+  const user = session?.user;
+
+  try {
+    const groupedSolutions = await prisma.problem.findMany({
+      where: {
+        solutions: {
+          some: {
+            savedBy: {
+              some: {
+                userId: user.id,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: "asc" },
+      select: {
+        id: true,
+        name: true,
+        solutions: {
+          where: {
+            savedBy: {
+              some: {
+                userId: user.id,
+              },
+            },
+          },
+          select: {
+            id: true,
+            code: true,
+            rank: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+      },
+    });
+
+    return groupedSolutions.map((problem) => ({
+      problemId: problem.id,
+      problemName: problem.name,
+      solutions: problem.solutions,
+    }));
+  } catch (error) {
+    console.log("ERROR FETCHING ALL SAVED SOLUTIONS", error);
+  }
+});
 
 export const toggleSolutionLikes = cache(async (solutionId: string) => {
   const session = await getServerSession(authOptions);

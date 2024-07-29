@@ -39,13 +39,17 @@ export const getAllGeneralProblems = cache(async () => {
             }
           : {}),
 
-        solutions: true,
+        solutions: {
+          orderBy: [{ rank: "desc" }],
+        },
+        createdAt: true,
       },
     });
 
-    const updatedArray = problems.map((problem) => {
-      return { ...problem, userId: user?.id ?? undefined };
-    });
+    const updatedArray = problems.map((problem) => ({
+      ...problem,
+      userId: user?.id ?? undefined,
+    }));
 
     return updatedArray;
   } catch (error) {
@@ -89,7 +93,9 @@ export const getAllNeetcodeProblems = cache(async () => {
               bookmarks: { where: { userId: user.id }, select: { id: true } },
             }
           : {}),
-        solutions: true,
+        solutions: {
+          orderBy: [{ rank: "desc" }],
+        },
       },
     });
     const updatedArray = problems.map((problem) => {
@@ -97,6 +103,28 @@ export const getAllNeetcodeProblems = cache(async () => {
     });
 
     return updatedArray;
+  } catch (error) {
+    console.log("ERROR FETCHING ALL PROBLEMS", error);
+  } finally {
+    await prisma.$disconnect();
+  }
+});
+
+export const getAllBookmarkedProblems = cache(async () => {
+  const session = await getServerSession(authOptions);
+  const user = session?.user;
+
+  try {
+    const problems = await prisma.bookmark.findMany({
+      ...(user
+        ? {
+            where: { userId: user.id },
+          }
+        : {}),
+      include: { problem: { select: { name: true } } },
+    });
+
+    return problems;
   } catch (error) {
     console.log("ERROR FETCHING ALL PROBLEMS", error);
   } finally {
@@ -136,8 +164,12 @@ export const getDisplayProblemInfo = cache(async (problemName: string) => {
       include: {
         testcases: true,
         solutions: {
+          orderBy: {
+            rank: "asc",
+          },
           include: {
             _count: { select: { likes: true, dislikes: true } },
+
             ...(user
               ? {
                   savedBy: {
