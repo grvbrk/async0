@@ -102,7 +102,7 @@ export default function Navbar() {
           {pathname != "/" && (
             <Link
               href="#"
-              className="font-bold transition-colors hover:text-primary text-muted-foreground"
+              className="hidden md:block md:font-bold md:transition-colors md:hover:text-primary md:text-muted-foreground"
             >
               <Sidebar />
             </Link>
