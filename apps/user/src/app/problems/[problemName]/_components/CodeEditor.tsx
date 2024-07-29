@@ -27,7 +27,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 type CodeEditorPropsType = {
   placeholderCode: string;
-  handleTestcaseSubmission: (code: string, run: boolean) => void;
+  handleTestcaseSubmission: (userFunction: string, run: boolean) => void;
   isPending: boolean;
   problemSubmitStatus: any;
   setProblemSubmitStatus: Dispatch<any>;
@@ -408,7 +408,6 @@ function ShowResults({
 }
 
 function ShowRunConsole(problem: any) {
-  console.log(problem);
   return (
     <>
       <pre className="text-sm text-muted-foreground mt-2 text-wrap">
@@ -449,15 +448,14 @@ function ConsoleData({
                 <span>{`${(problem.value.time * 1000).toFixed(0)}ms `}</span>
               </div>
 
+              {error && problem.value.stderr && (
+                <pre className="text-sm text-muted-foreground">
+                  {`Error: ${problem.value.stderr}`}
+                </pre>
+              )}
               {error && problem.value.stdout && (
                 <pre className="text-sm text-muted-foreground">
                   {`Your Output: ${problem.value.stdout}`}
-                </pre>
-              )}
-
-              {error && problem.value.stderr && (
-                <pre className="text-sm text-muted-foreground">
-                  {`Your Output: ${problem.value.stderr}`}
                 </pre>
               )}
             </>

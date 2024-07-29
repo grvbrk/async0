@@ -70,7 +70,7 @@ export function useUserProblemColumns(): ColumnDef<userProblemDetailsType>[] {
             </div>
           );
         },
-        size: 50,
+        size: 100,
       },
 
       {
@@ -114,7 +114,7 @@ export function useUserProblemColumns(): ColumnDef<userProblemDetailsType>[] {
           const isBookmarked = userBookmarks.length > 0;
           return filterValue ? isBookmarked : true;
         },
-        size: 50,
+        size: 100,
       },
 
       {
@@ -206,7 +206,7 @@ export function useUserProblemColumns(): ColumnDef<userProblemDetailsType>[] {
           const topics = row.getValue(columnId) as Topic[];
           return topics.some((topic) => topic.name === filterValue);
         },
-        size: 100,
+        size: 200,
       },
       {
         accessorKey: "lists",

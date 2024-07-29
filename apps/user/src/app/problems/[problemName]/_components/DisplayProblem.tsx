@@ -76,10 +76,15 @@ export default function DisplayProblem({
 
     setActiveTab(newTab);
   }
-  async function handleTestcaseSubmission(code: string, run: boolean) {
+  async function handleTestcaseSubmission(userFunction: string, run: boolean) {
     startTransition(async () => {
       // response variable gets the final result from judge0
-      const response = await codeSubmission(code, problem, problemName, run);
+      const response = await codeSubmission(
+        userFunction,
+        problem,
+        problemName,
+        run
+      );
       if (response && Array.isArray(response)) {
         const firstErrorIndex = response.findIndex((problem: any) =>
           [4, 5, 6, 7, 8, 9, 10, 11, 12].includes(problem.value.status.id)
