@@ -43,6 +43,28 @@ export const toggleBookmark = cache(async (problemId: string) => {
   revalidatePath("/problems/[problemName]");
 });
 
+export const getAllBookmarkedProblems = cache(async () => {
+  const session = await getServerSession(authOptions);
+  const user = session?.user;
+  if (!user) return;
+  try {
+    const problems = await prisma.bookmark.findMany({
+      ...(user
+        ? {
+            where: { userId: user.id },
+          }
+        : {}),
+      include: { problem: { select: { name: true } } },
+      orderBy: { createdAt: "desc" },
+    });
+    return problems;
+  } catch (error) {
+    console.log("ERROR FETCHING ALL PROBLEMS", error);
+  } finally {
+    await prisma.$disconnect();
+  }
+});
+
 // function wait(ms: number) {
 //   return new Promise((res) => {
 //     setTimeout(res, ms);

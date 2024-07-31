@@ -110,28 +110,6 @@ export const getAllNeetcodeProblems = cache(async () => {
   }
 });
 
-export const getAllBookmarkedProblems = cache(async () => {
-  const session = await getServerSession(authOptions);
-  const user = session?.user;
-
-  try {
-    const problems = await prisma.bookmark.findMany({
-      ...(user
-        ? {
-            where: { userId: user.id },
-          }
-        : {}),
-      include: { problem: { select: { name: true } } },
-    });
-
-    return problems;
-  } catch (error) {
-    console.log("ERROR FETCHING ALL PROBLEMS", error);
-  } finally {
-    await prisma.$disconnect();
-  }
-});
-
 export const getAllProblems = cache(async () => {
   try {
     return await prisma.problem.findMany();

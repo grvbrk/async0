@@ -11,6 +11,7 @@ export const getAllSavedSolutions = cache(async () => {
   const user = session?.user;
 
   try {
+    if (!user) return;
     const groupedSolutions = await prisma.problem.findMany({
       where: {
         solutions: {
@@ -23,7 +24,7 @@ export const getAllSavedSolutions = cache(async () => {
           },
         },
       },
-      orderBy: { createdAt: "asc" },
+      orderBy: { createdAt: "desc" },
       select: {
         id: true,
         name: true,
@@ -87,7 +88,6 @@ export const toggleSolutionDislikes = cache(async (solutionId: string) => {
     const isSolutionDisliked = await prisma.dislike.findUnique({
       where: { userId_solutionId: { userId: user.id, solutionId } },
     });
-    console.log(isSolutionDisliked);
 
     if (isSolutionDisliked) {
       await prisma.dislike.delete({

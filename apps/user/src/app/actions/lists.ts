@@ -12,15 +12,3 @@ export const getAllListData = cache(async () => {
     await prisma.$disconnect();
   }
 });
-
-// export const getSidebarData = cache(async () => {
-//   try {
-//     return await prisma.list.findMany({
-//       include: { topic: { include: { problem: true } } },
-//     });
-//   } catch (error) {
-//     console.log("ERRROR FETCHING ALL TOPICS", error);
-//   } finally {
-//     await prisma.$disconnect();
-//   }
-// });
