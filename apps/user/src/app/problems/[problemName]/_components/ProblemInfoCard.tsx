@@ -100,7 +100,7 @@ export default function ProblemInfoCard({
               {DescriptionComponent ? (
                 <DescriptionComponent theme={theme} />
               ) : (
-                <h1>No description found.</h1>
+                <h1>No notes found.</h1>
               )}
             </CardDescription>
           </CardHeader>

@@ -11,10 +11,11 @@ import type {
   Topic,
 } from "@repo/db";
 import { Badge } from "@repo/ui/components/ui/badge";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toggleBookmark } from "../actions/bookmarks";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export type userProblemDetailsType = {
   id: string;
@@ -42,7 +43,13 @@ export type userProblemDetailsType = {
 
 export function useUserProblemColumns(): ColumnDef<userProblemDetailsType>[] {
   const { data: session } = useSession();
-  const user: any = session?.user;
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return useMemo(() => {
     const columns: ColumnDef<userProblemDetailsType>[] = [
       {
@@ -86,25 +93,29 @@ export function useUserProblemColumns(): ColumnDef<userProblemDetailsType>[] {
           );
           return (
             <div className="flex justify-center">
-              <Bookmark
-                size={16}
-                className={`${user && isBookmarked && "fill-primary text-primary"}`}
-                onClick={async (e) => {
-                  e.stopPropagation();
-                  if (user) {
-                    setIsBookmarked(!isBookmarked);
-                    const result = await toggleBookmark(problemData.id);
-                    if (result === false || undefined) {
-                      setIsBookmarked(false);
-                    } else setIsBookmarked(true);
-                  } else {
-                    toast.error(
-                      "You need to login before bookmarking problems"
-                    );
-                    return;
-                  }
-                }}
-              />
+              {
+                <Bookmark
+                  size={16}
+                  className={`${isBookmarked && "fill-primary text-primary"}`}
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    if (session) {
+                      setIsBookmarked(!isBookmarked);
+                      const result = await toggleBookmark(problemData.id);
+                      if (result === false || undefined) {
+                        setIsBookmarked(false);
+                      } else setIsBookmarked(true);
+
+                      router.refresh();
+                    } else {
+                      toast.error(
+                        "You need to login before bookmarking problems"
+                      );
+                      return;
+                    }
+                  }}
+                />
+              }
             </div>
           );
         },
@@ -134,7 +145,7 @@ export function useUserProblemColumns(): ColumnDef<userProblemDetailsType>[] {
         },
         cell: ({ row }) => {
           const problemName = row.getValue("name") as string;
-          return <div> {problemName} </div>;
+          return <div className="line-clamp-1"> {problemName} </div>;
         },
         size: 200,
       },
@@ -197,16 +208,14 @@ export function useUserProblemColumns(): ColumnDef<userProblemDetailsType>[] {
         cell: ({ row }) => {
           const topicList = row.getValue("topics") as Topic[];
           return (
-            <div className=" flex justify-center text-center ">
-              {topicList[0].name}
-            </div>
+            <div className="line-clamp-1 text-center">{topicList[0].name}</div>
           );
         },
         filterFn: (row, columnId, filterValue) => {
           const topics = row.getValue(columnId) as Topic[];
           return topics.some((topic) => topic.name === filterValue);
         },
-        size: 200,
+        size: 100,
       },
       {
         accessorKey: "lists",

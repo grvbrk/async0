@@ -21,7 +21,8 @@ import { unescapeCode } from "@repo/common";
 import AnimatePanel from "./AnimatePanel";
 import ProblemInfoCard from "./ProblemInfoCard";
 import ProblemSolutionCard from "./ProblemSolutionCard";
-import { Bookmark, Solution, Testcase } from "@repo/db";
+import { Bookmark, Solution, Submission, Testcase } from "@repo/db";
+import ProblemSubmissionCard from "./ProblemSubmissionCard";
 
 export type SolutionWithCounts = Solution & {
   _count: {
@@ -52,9 +53,11 @@ export type DisplayProblemPropType =
 
 export default function DisplayProblem({
   problem,
+  submissions,
   problemName,
 }: {
   problem: DisplayProblemPropType;
+  submissions: Submission[];
   problemName: string;
 }) {
   const [problemSubmitStatus, setProblemSubmitStatus] = useState<any>([]);
@@ -144,12 +147,7 @@ export default function DisplayProblem({
             ) : activeTab === "solution" ? (
               <ProblemSolutionCard problem={problem!} />
             ) : (
-              <Card className="h-[75vh] overflow-y-auto">
-                <CardHeader>
-                  <CardTitle>Submissions</CardTitle>
-                  <CardDescription>No submission found.</CardDescription>
-                </CardHeader>
-              </Card>
+              <ProblemSubmissionCard submissions={submissions} />
             )}
           </AnimatePanel>
         </Tabs>

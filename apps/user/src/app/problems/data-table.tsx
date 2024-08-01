@@ -21,7 +21,7 @@ import {
   TableRow,
 } from "@repo/ui/components/ui/table";
 import { Button } from "@repo/ui/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUserProblemColumns, userProblemDetailsType } from "./columns";
 import {
@@ -40,6 +40,8 @@ import React from "react";
 import { getAllGeneralTopics, getTopicsByList } from "../actions/topics";
 import { Checkbox } from "@repo/ui/components/ui/checkbox";
 import { useSession } from "next-auth/react";
+import useWindowDimensions from "../hooks/useWindowDimensions";
+import { COLUMN_VISIBILITY_BREAKPOINTS } from "@/lib/utils";
 
 type ProblemDetails = userProblemDetailsType | NeetcodeProblemDetails;
 
@@ -57,11 +59,12 @@ export function DataTable<TData extends ProblemDetails>({
   allTopics,
 }: DataTableProps<TData>) {
   const { data: session } = useSession();
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState({});
   const [topics, setTopics] = useState<Topic[]>(allTopics ?? []);
   const [sorting, setSorting] = useState<SortingState>([]);
+  const { height, width } = useWindowDimensions();
+
   const columns =
     tag === "general" ? useUserProblemColumns() : useNeetcodeColumns();
 
@@ -75,12 +78,21 @@ export function DataTable<TData extends ProblemDetails>({
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    initialState: { pagination: { pageSize: 20 } },
+    onColumnVisibilityChange: setColumnVisibility,
+    initialState: { pagination: { pageSize: 30 } },
     state: {
       sorting,
       columnFilters,
+      columnVisibility,
     },
   });
+
+  useEffect(() => {
+    const newColumnVisibility =
+      COLUMN_VISIBILITY_BREAKPOINTS.find((point) => width <= point.max)
+        ?.columns || {};
+    setColumnVisibility((prev) => ({ ...prev, ...newColumnVisibility }));
+  }, [width]);
 
   function handleRowClick(problemName: string) {
     problemName = problemName.split(" ").join("-");
@@ -155,7 +167,7 @@ export function DataTable<TData extends ProblemDetails>({
           <div className="grid gap-1.5 leading-none">
             <label
               htmlFor="terms1"
-              className="text-sm peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              className="text-sm peer-disabled:cursor-not-allowed peer-disabled:opacity-70 line-clamp-1"
             >
               Show Bookmarked Problems
             </label>

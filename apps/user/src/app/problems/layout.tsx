@@ -7,7 +7,7 @@ export default async function ProblemsLayout({
 }) {
   return (
     <>
-      <div className="w-screen">
+      <div>
         <BreadCrumbs />
         {children}
       </div>

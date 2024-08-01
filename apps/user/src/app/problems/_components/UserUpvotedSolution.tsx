@@ -75,12 +75,12 @@ export default function UserUpvotedSolution({
                             <DialogContent>
                               <DialogHeader>
                                 <DialogTitle className="mb-2">
-                                  <div className="w-48 overflow-hidden">
+                                  <div className="w-72 overflow-hidden">
                                     {`Problem: ${solution.problemName}`}
                                   </div>
                                   <div className="text-sm text-muted-foreground mt-1">{`Solution ${s.rank + 1}`}</div>
                                 </DialogTitle>
-                                <DialogDescription>
+                                <DialogDescription className="overflow-auto">
                                   <CodeBlock
                                     code={s.code}
                                     theme={mounted ? theme ?? "dark" : "dark"}
@@ -98,7 +98,7 @@ export default function UserUpvotedSolution({
             })
           ) : (
             <h1 className="text-sm text-muted-foreground">
-              No saved solutions to show
+              No solutions to show
             </h1>
           )}
         </CardContent>
