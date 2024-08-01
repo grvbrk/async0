@@ -2,9 +2,11 @@
 
 import axios from "axios";
 import { cache } from "react";
-import { judge0TokenResponseType, problemDriverCode } from "@repo/common";
+import { judge0ValueKeyType, problemDriverCode } from "@repo/common";
 import { DisplayProblemPropType } from "../problems/[problemName]/_components/DisplayProblem";
 import { runCode } from "./runCode";
+import { requestBody } from "@repo/common/driver/types";
+import { createSubmission } from "./submissions";
 
 export const codeSubmission = cache(
   async (
@@ -26,7 +28,7 @@ export const codeSubmission = cache(
         console.log("Error submitting RUN code");
       }
     } else {
-      const batchSubmission = problemDriverCode[problemName](
+      const batchSubmission: requestBody = problemDriverCode[problemName](
         userFunction,
         problem?.testcases || []
       );
@@ -43,16 +45,30 @@ export const codeSubmission = cache(
           });
 
           // FINAL RESPONSE FROM JUDGE0
-          const responses: PromiseSettledResult<judge0TokenResponseType>[] =
-            await Promise.allSettled(
-              tokens.map((token) => checkPromiseStatus(token))
-            );
+          const responses = await Promise.allSettled(
+            tokens.map((token) => checkPromiseStatus(token))
+          );
+
+          const successfulResponses = responses
+            .filter(
+              (result): result is PromiseFulfilledResult<judge0ValueKeyType> =>
+                result.status === "fulfilled"
+            )
+            .map((result) => result.value);
           // TODO: Map responses and call a server action to hasUserSolvedTable
+          const totalTestcases = batchSubmission.submissions.length;
+          const problemId = problem?.id;
+
+          await createSubmission(
+            successfulResponses,
+            totalTestcases,
+            problemId as string
+          );
 
           return responses;
         }
       } catch (error) {
-        console.log("Error submitting SUBMIT code");
+        console.log("Error submitting SUBMIT code", error);
       }
     }
   }
@@ -60,7 +76,7 @@ export const codeSubmission = cache(
 
 export async function checkPromiseStatus(
   token: string
-): Promise<judge0TokenResponseType> {
+): Promise<judge0ValueKeyType> {
   return new Promise((resolve) => {
     async function checkStatus() {
       const response = await axios.get(
