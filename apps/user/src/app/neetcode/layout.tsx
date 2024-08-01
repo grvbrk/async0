@@ -6,7 +6,7 @@ export default async function NeetcodeProblemsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="w-screen">
+    <div>
       <BreadCrumbs />
       {children}
     </div>

@@ -78,7 +78,7 @@ export function useNeetcodeColumns(): ColumnDef<NeetcodeProblemDetails>[] {
             </div>
           );
         },
-        size: 50,
+        size: 100,
       },
       {
         accessorKey: "bookmarks",
@@ -121,7 +121,7 @@ export function useNeetcodeColumns(): ColumnDef<NeetcodeProblemDetails>[] {
           const isBookmarked = userBookmarks.length > 0;
           return filterValue ? isBookmarked : true;
         },
-        size: 50,
+        size: 100,
       },
       {
         accessorKey: "name",
@@ -140,7 +140,7 @@ export function useNeetcodeColumns(): ColumnDef<NeetcodeProblemDetails>[] {
         },
         cell: ({ row }) => {
           const problemName = row.getValue("name") as string;
-          return <div className=""> {problemName} </div>;
+          return <div className="line-clamp-1 "> {problemName} </div>;
         },
         size: 200,
       },
@@ -204,9 +204,7 @@ export function useNeetcodeColumns(): ColumnDef<NeetcodeProblemDetails>[] {
         cell: ({ row }) => {
           const topicList = row.getValue("topics") as Topic[];
           return (
-            <div className=" flex justify-center text-center">
-              {topicList[0].name}
-            </div>
+            <div className="line-clamp-1 text-center">{topicList[0].name}</div>
           );
         },
         filterFn: (row, columnId, filterValue) => {
