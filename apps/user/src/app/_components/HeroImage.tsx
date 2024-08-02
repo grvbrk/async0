@@ -34,7 +34,7 @@ export default function HeroImage() {
           <Image
             src={theme === "light" ? JobStressBlack : JobStressWhite}
             alt="stress"
-            className="  h-auto w-[1000px]"
+            className="h-auto w-[1000px]"
             priority
             loading="eager"
           />

@@ -15,7 +15,7 @@ export default function TextImage() {
     setMounted(true);
   }, []);
 
-  if (!mounted) return null;
+  if (!mounted) return <div className="w-[400px] h-[54.031px]"></div>;
   return (
     <AnimatePresence>
       <motion.div
