@@ -56,13 +56,14 @@ export const codeSubmission = cache(
             )
             .map((result) => result.value);
           // TODO: Map responses and call a server action to hasUserSolvedTable
-          const totalTestcases = batchSubmission.submissions.length;
+          const totalTestcases = problem?.testcases.length;
           const problemId = problem?.id;
 
           await createSubmission(
             successfulResponses,
-            totalTestcases,
-            problemId as string
+            totalTestcases as number,
+            problemId as string,
+            userFunction
           );
 
           return responses;

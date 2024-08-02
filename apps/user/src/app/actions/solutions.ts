@@ -1,7 +1,7 @@
 "use server";
 
 import { cache } from "react";
-import prisma, { Solution } from "@repo/db";
+import prisma from "@repo/db";
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/authOptions";

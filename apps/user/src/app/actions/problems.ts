@@ -166,17 +166,36 @@ export const getDisplayProblemInfo = cache(async (problemName: string) => {
               : {}),
           },
         },
-        ...(user ? { bookmarks: { where: { userId: user.id } } } : {}),
+        ...(user
+          ? {
+              bookmarks: { where: { userId: user.id } },
+              hasUserSolved: {
+                where: { userId: user.id },
+                select: { id: true },
+              },
+            }
+          : {}),
       },
     });
-    if (problem && problem.solutions) {
-      problem.solutions = problem.solutions.map((solution) => ({
-        ...solution,
-        isSaved: solution.savedBy && solution.savedBy.length > 0,
-        isLiked: solution.likes && solution.likes.length > 0,
-        isDisliked: solution.dislikes && solution.dislikes.length > 0,
-      }));
+    if (problem) {
+      if (problem.solutions) {
+        problem.solutions = problem.solutions.map((solution) => ({
+          ...solution,
+          isSaved: solution.savedBy && solution.savedBy.length > 0,
+          isLiked: solution.likes && solution.likes.length > 0,
+          isDisliked: solution.dislikes && solution.dislikes.length > 0,
+        }));
+      }
+
+      if (user) {
+        //@ts-ignore
+        problem.isSolved =
+          problem.hasUserSolved && problem.hasUserSolved.length > 0;
+        //@ts-ignore
+        delete problem.hasUserSolved;
+      }
     }
+
     return problem;
   } catch (error) {
     console.log("ERROR FETCHING PROBLEM BY NAME", error);

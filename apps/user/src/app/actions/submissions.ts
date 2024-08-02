@@ -5,15 +5,20 @@ import prisma from "@repo/db";
 import { authOptions } from "@/lib/authOptions";
 import { getServerSession } from "next-auth";
 import { judge0ValueKeyType } from "@repo/common";
+import { revalidatePath } from "next/cache";
 
 export const createSubmission = cache(
   async (
     successfulResponses: judge0ValueKeyType[],
     totalTestcases: number,
-    problemId: string
+    problemId: string,
+    userFunction: string
   ) => {
     const session = await getServerSession(authOptions);
     const user = session?.user;
+
+    if (!user || !user.id) return;
+
     const firstErrorIndex = successfulResponses.findIndex((res: any) =>
       [4, 5, 6, 7, 8, 9, 10, 11, 12].includes(res.status.id)
     );
@@ -28,47 +33,82 @@ export const createSubmission = cache(
             ? "Rejected"
             : "TimeLimit";
       try {
-        await prisma.submission.create({
-          data: {
-            status: status,
-            userId: user.id,
-            totalTestcases: totalTestcases,
-            passedTestcases:
-              firstErrorIndex === -1 ? totalTestcases : firstErrorIndex,
-            testcaseResults: JSON.stringify(successfulResponses),
-            problemId,
-          },
+        await prisma.$transaction(async () => {
+          const submission = await prisma.submission.create({
+            data: {
+              status: status,
+              userId: user.id,
+              totalTestcases: totalTestcases,
+              passedTestcases:
+                firstErrorIndex === -1 ? totalTestcases : firstErrorIndex,
+              testcaseResults: JSON.stringify(successfulResponses),
+              problemId,
+            },
+          });
+
+          await prisma.userSolution.create({
+            data: {
+              code: userFunction,
+              submissionId: submission.id,
+              userId: user.id,
+            },
+          });
         });
       } catch (error) {
         console.log("ERROR CREATING SUBMISSION");
       }
     } else {
       try {
-        await prisma.submission.create({
-          data: {
-            status: "Accepted",
-            userId: user.id,
-            totalTestcases: totalTestcases,
-            passedTestcases: totalTestcases,
-            testcaseResults: JSON.stringify(successfulResponses),
-            problemId,
-          },
+        await prisma.$transaction(async () => {
+          const submission = await prisma.submission.create({
+            data: {
+              status: "Accepted",
+              userId: user.id,
+              totalTestcases: totalTestcases,
+              passedTestcases: totalTestcases,
+              testcaseResults: JSON.stringify(successfulResponses),
+              problemId,
+            },
+          });
+
+          await prisma.userSolution.create({
+            data: {
+              code: userFunction,
+              submissionId: submission.id,
+              userId: user.id,
+            },
+          });
+
+          await prisma.hasUserSolved.create({
+            data: {
+              submissionId: submission.id,
+              userId: user.id,
+              problemId,
+            },
+          });
         });
       } catch (error) {
         console.log("ERROR CREATING SUBMISSION");
       }
     }
+    revalidatePath("/");
+    revalidatePath("/problems");
   }
 );
 
-export const getAllSubmissions = cache(async () => {
+export const getAllSubmissions = cache(async (problemId: string) => {
   const session = await getServerSession(authOptions);
   const user = session?.user;
+
+  if (!user || !user.id) return;
+
   try {
     const submissions = await prisma.submission.findMany({
       where: {
         userId: user.id,
+        problemId,
       },
+      include: { userSolution: true },
       orderBy: { createdAt: "desc" },
     });
 
