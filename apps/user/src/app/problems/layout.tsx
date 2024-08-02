@@ -1,3 +1,4 @@
+import Searchbar from "../_components/Searchbar";
 import BreadCrumbs from "./_components/BreadCrumbs";
 
 export default async function ProblemsLayout({
@@ -8,7 +9,10 @@ export default async function ProblemsLayout({
   return (
     <>
       <div>
-        <BreadCrumbs />
+        <div className="flex items-center">
+          <BreadCrumbs />
+          <Searchbar className="lg:hidden ml-auto mt-5" />
+        </div>
         {children}
       </div>
     </>

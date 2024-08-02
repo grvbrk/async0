@@ -64,15 +64,15 @@ export function useUserProblemColumns(): ColumnDef<userProblemDetailsType>[] {
               passedTestcases: number;
               totalTestcases: number;
             };
-          };
-          const isSolved = userSolvedStatus?.Submission?.status === "Accepted";
+          }[];
+          const isSolved = userSolvedStatus.length > 0;
 
           return (
             <div className="flex justify-center">
               {isSolved ? (
                 <Check className="text-green-600" />
               ) : (
-                <Code className=" size-5" />
+                <Code className="size-5" />
               )}
             </div>
           );
@@ -166,6 +166,7 @@ export function useUserProblemColumns(): ColumnDef<userProblemDetailsType>[] {
         },
         size: 100,
       },
+
       {
         accessorKey: "difficulty",
         header: ({ column }) => {
@@ -200,6 +201,7 @@ export function useUserProblemColumns(): ColumnDef<userProblemDetailsType>[] {
         },
         size: 100,
       },
+
       {
         accessorKey: "topics",
         header: ({ column }) => {
@@ -217,6 +219,7 @@ export function useUserProblemColumns(): ColumnDef<userProblemDetailsType>[] {
         },
         size: 100,
       },
+
       {
         accessorKey: "lists",
         header: ({ column }) => {

@@ -31,7 +31,6 @@ import { getSidebarData } from "@/app/actions/topics";
 function Sidebar() {
   const { data: session } = useSession();
   const [sidebarData, setSidebarData] = useState<any>([]);
-
   async function handleSidebarClick() {
     const data = await getSidebarData();
     setSidebarData(data);
@@ -83,36 +82,43 @@ function Sidebar() {
           )}
           <div className="overflow-y-auto px-6 flex-grow ">
             {sidebarData.map((topic: any, index: number) => {
+              const isListSolved: boolean = topic.problems.every((p: any) => {
+                p.solved === true;
+              });
               return (
                 <Accordion key={index} type="single" collapsible>
                   <AccordionItem value={topic.name}>
                     <AccordionTrigger>
-                      <div className="flex items-center gap-2">
+                      <div
+                        className={`flex items-center gap-2 ${isListSolved && "text-green-600"}`}
+                      >
                         <CodeXml className="w-4 h-5" />
                         {topic.name}
                       </div>
                     </AccordionTrigger>
                     <AccordionContent className="flex flex-col gap-2 pl-6 mb-2 text-muted-foreground">
                       {topic && topic.problems.length > 0 ? (
-                        topic.problems.map(
-                          (problem: Problem, index: number) => {
-                            return (
-                              <div
-                                key={index}
-                                className="flex gap-2 items-center"
+                        topic.problems.map((problem: any, index: number) => {
+                          return (
+                            <div
+                              key={index}
+                              className="flex gap-2 items-center"
+                            >
+                              <Binary
+                                className={`w-4 h-4  ${problem.solved ? "text-green-600" : "text-primary"}`}
+                              />
+                              <Link
+                                href={`/problems/${problem.name.replace(/\s+/g, "-")}`}
+                                className={`flex items-center gap-2 ${problem.solved ? "text-green-600 hover:text-green-400" : "text-primary hover:text-primary"}`}
                               >
-                                <Binary className="w-4 h-4 text-primary" />
-                                <Link
-                                  href={`/problems/${problem.name.replace(/\s+/g, "-")}`}
-                                  className="hover:text-primary flex items-center gap-2 "
-                                >
-                                  {problem.name}
-                                  <ExternalLink className="w-3 h-3 text-muted-foreground" />
-                                </Link>
-                              </div>
-                            );
-                          }
-                        )
+                                <p className="line-clamp-1">{problem.name}</p>
+                                <ExternalLink
+                                  className={`w-3 h-3 text-muted-foreground`}
+                                />
+                              </Link>
+                            </div>
+                          );
+                        })
                       ) : (
                         <h1>No problem found</h1>
                       )}

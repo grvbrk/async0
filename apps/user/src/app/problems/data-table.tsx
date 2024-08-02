@@ -58,6 +58,7 @@ export function DataTable<TData extends ProblemDetails>({
   lists,
   allTopics,
 }: DataTableProps<TData>) {
+  console.log(data);
   const { data: session } = useSession();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState({});
