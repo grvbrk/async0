@@ -122,7 +122,7 @@ export default function ProblemSolutionCard({
   }
 
   return (
-    <Card className="h-[75vh] overflow-y-auto ">
+    <Card className="h-[75vh] overflow-y-auto">
       {problem ? (
         <>
           <CardHeader>
@@ -167,7 +167,7 @@ export default function ProblemSolutionCard({
                               </p>
                             </div>
                             <Heart
-                              className={`h-4 w-4 hover:text-primary hover:cursor-pointer ${solution.isSaved && "fill-red-600 text-primary"}`}
+                              className={`h-4 w-4 hover:text-primary hover:cursor-pointer ${solution.isSaved && "fill-red-600 stroke-red-600  text-primary"}`}
                               onClick={() =>
                                 startTransition(() =>
                                   handleSaveToggle(solution.id)

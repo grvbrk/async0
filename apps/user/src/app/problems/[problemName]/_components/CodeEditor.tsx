@@ -24,6 +24,7 @@ import { Switch } from "@repo/ui/components/ui/switch";
 import { Tabs, TabsList } from "@repo/ui/components/ui/tabs";
 import Counter from "./Counter";
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 type CodeEditorPropsType = {
   placeholderCode: string;
@@ -59,6 +60,7 @@ export default function CodeEditor({
   const [lineHeight, setLineHeight] = useState<number>(23);
   const [intellisenseActive, setIntellisenseActive] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
+  const router = useRouter();
 
   function handleMount(editor: editor.IStandaloneCodeEditor, monaco: Monaco) {
     editorRef.current = editor;
@@ -87,6 +89,8 @@ export default function CodeEditor({
       toast.error("You need to login first");
       return;
     }
+
+    router.refresh();
     handleTestcaseSubmission(value, false);
     setProblemRunStatus({});
     setShowConsole(true);

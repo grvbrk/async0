@@ -66,35 +66,54 @@ export default function ProblemInfoCard({
       {problem ? (
         <>
           <CardHeader>
-            <CardTitle className="flex items-center mb-2 ">
-              <div className="text-2xl font-extrabold">{problem.name}</div>
-              <Link
-                href={problem.link || "#"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="cursor-pointer ml-2"
+            <CardTitle className="flex items-center md:flex-col md:items-start lg:flex-row lg:items-center mb-2">
+              <div
+                className={`flex items-center gap-2 text-2xl font-extrabold`}
               >
-                <ExternalLink className="h-4 w-4" />
-              </Link>
+                <p
+                  className={`${
+                    //@ts-ignore
+                    problem.isSolved && "text-green-600"
+                  } line-clamp-1`}
+                >
+                  {problem.name}
+                </p>
 
-              {session && (
-                <Bookmark
-                  className={`h-5 w-5 ml-4 hover:text-primary hover:cursor-pointer ${isBookmarked && "fill-primary"}`}
-                  onClick={async () => {
-                    setIsBookmarked(!isBookmarked);
-                    const result = await toggleBookmark(problem.id);
-                    if (result === false || undefined) {
-                      setIsBookmarked(false);
-                    } else setIsBookmarked(true);
-                  }}
-                />
-              )}
+                <Link
+                  href={problem.link || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="cursor-pointer md:hidden lg:block"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </Link>
 
-              <Badge
-                className={`text-background ${problem.difficulty === "Easy" ? "bg-green-600" : problem.difficulty === "Medium" ? "bg-yellow-600" : "bg-red-600"} ml-auto`}
-              >
-                {problem.difficulty}
-              </Badge>
+                {session && (
+                  <Bookmark
+                    className={`h-5 w-5  hover:text-primary hover:cursor-pointer ${isBookmarked && "fill-primary"}`}
+                    onClick={async () => {
+                      setIsBookmarked(!isBookmarked);
+                      const result = await toggleBookmark(problem.id);
+                      if (result === false || undefined) {
+                        setIsBookmarked(false);
+                      } else setIsBookmarked(true);
+                    }}
+                  />
+                )}
+              </div>
+              <div className="flex ml-auto md:ml-0 lg:ml-auto">
+                {
+                  //@ts-ignore
+                  problem.isSolved && (
+                    <Badge className={`bg-green-600 mr-2`}>Solved</Badge>
+                  )
+                }
+                <Badge
+                  className={`text-background ${problem.difficulty === "Easy" ? "bg-green-600" : problem.difficulty === "Medium" ? "bg-yellow-600" : "bg-red-600"}`}
+                >
+                  {problem.difficulty}
+                </Badge>
+              </div>
             </CardTitle>
             <CardDescription>
               {DescriptionComponent ? (

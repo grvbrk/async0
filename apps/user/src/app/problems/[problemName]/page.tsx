@@ -8,7 +8,7 @@ export default async function page({
   params: { problemName: string };
 }) {
   const problem = await getDisplayProblemInfo(problemName.split("-").join(" "));
-  const submissions = await getAllSubmissions();
+  const submissions = await getAllSubmissions(problem?.id as string);
   return (
     <>
       <DisplayProblem

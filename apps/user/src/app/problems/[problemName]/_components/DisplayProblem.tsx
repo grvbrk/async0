@@ -7,12 +7,6 @@ import {
 } from "@repo/ui/components/ui/resizable";
 
 import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/ui/tabs";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/components/ui/card";
 import { BookOpen, Code, NotebookText } from "lucide-react";
 import CodeEditor from "./CodeEditor";
 import { useState, useTransition } from "react";
@@ -21,7 +15,13 @@ import { unescapeCode } from "@repo/common";
 import AnimatePanel from "./AnimatePanel";
 import ProblemInfoCard from "./ProblemInfoCard";
 import ProblemSolutionCard from "./ProblemSolutionCard";
-import { Bookmark, Solution, Submission, Testcase } from "@repo/db";
+import {
+  Bookmark,
+  Solution,
+  Submission,
+  Testcase,
+  UserSolution,
+} from "@repo/db";
 import ProblemSubmissionCard from "./ProblemSubmissionCard";
 
 export type SolutionWithCounts = Solution & {
@@ -57,7 +57,7 @@ export default function DisplayProblem({
   problemName,
 }: {
   problem: DisplayProblemPropType;
-  submissions: Submission[];
+  submissions: (Submission & { userSolution: UserSolution | null })[];
   problemName: string;
 }) {
   const [problemSubmitStatus, setProblemSubmitStatus] = useState<any>([]);
