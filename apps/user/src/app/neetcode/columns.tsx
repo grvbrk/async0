@@ -23,6 +23,7 @@ import { toggleBookmark } from "../actions/bookmarks";
 import { userProblemDetailsType } from "../problems/columns";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export type NeetcodeProblemDetails = {
   id: string;
@@ -50,6 +51,7 @@ export type NeetcodeProblemDetails = {
 export function useNeetcodeColumns(): ColumnDef<NeetcodeProblemDetails>[] {
   const { data: session } = useSession();
   const user: any = session?.user;
+  const router = useRouter();
 
   return useMemo(() => {
     const columns: ColumnDef<NeetcodeProblemDetails>[] = [
@@ -59,27 +61,28 @@ export function useNeetcodeColumns(): ColumnDef<NeetcodeProblemDetails>[] {
           return <div className="flex justify-center">Status</div>;
         },
         cell: ({ row }) => {
-          const hasUserSolved = row.getValue("hasUserSolved") as {
+          const userSolvedStatus = row.getValue("hasUserSolved") as {
             Submission: {
               status: Status;
               passedTestcases: number;
               totalTestcases: number;
             };
-          };
-          const isSolved = hasUserSolved?.Submission?.status === "Accepted";
+          }[];
+          const isSolved = userSolvedStatus.length > 0;
 
           return (
             <div className="flex justify-center">
               {isSolved ? (
                 <Check className="text-green-600" />
               ) : (
-                <Code className=" size-5" />
+                <Code className="size-5" />
               )}
             </div>
           );
         },
         size: 100,
       },
+
       {
         accessorKey: "bookmarks",
         header: ({ column }) => {
@@ -104,6 +107,7 @@ export function useNeetcodeColumns(): ColumnDef<NeetcodeProblemDetails>[] {
                     if (result === false || undefined) {
                       setIsBookmarked(false);
                     } else setIsBookmarked(true);
+                    router.refresh();
                   } else {
                     toast.error(
                       "You need to login before bookmarking problems"
@@ -123,6 +127,7 @@ export function useNeetcodeColumns(): ColumnDef<NeetcodeProblemDetails>[] {
         },
         size: 100,
       },
+
       {
         accessorKey: "name",
         header: ({ column }) => {
@@ -140,10 +145,11 @@ export function useNeetcodeColumns(): ColumnDef<NeetcodeProblemDetails>[] {
         },
         cell: ({ row }) => {
           const problemName = row.getValue("name") as string;
-          return <div className="line-clamp-1 "> {problemName} </div>;
+          return <div className="line-clamp-1"> {problemName} </div>;
         },
         size: 200,
       },
+
       {
         accessorKey: "solutions",
         header: ({ column }) => {
@@ -161,6 +167,7 @@ export function useNeetcodeColumns(): ColumnDef<NeetcodeProblemDetails>[] {
         },
         size: 100,
       },
+
       {
         accessorKey: "difficulty",
         header: ({ column }) => {
@@ -213,6 +220,7 @@ export function useNeetcodeColumns(): ColumnDef<NeetcodeProblemDetails>[] {
         },
         size: 100,
       },
+
       {
         accessorKey: "link",
         header: ({ column }) => {
