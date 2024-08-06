@@ -27,7 +27,6 @@ export async function addOneProblem(prevState: unknown, formData: FormData) {
       delete data[key];
     }
   }
-  console.log(data);
   const name = data.name as string;
   const link = data.link as string;
   const difficulty = data.difficulty as Difficulty;

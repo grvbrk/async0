@@ -77,7 +77,6 @@ export const updateProblem = cache(
     topicName: string,
     listName: PopularLists
   ) => {
-    console.log(solutions);
     try {
       const topic = await prisma.topic.findFirst({
         where: {

@@ -18,12 +18,9 @@ export const authOptions = {
   callbacks: {
     // This callback will be invoked on successful signin by user
     async signIn({ profile }: any) {
-      const adminEmail = process.env.NEXTAUTH_ADMIN_EMAIL;
-      if (adminEmail != profile.email) {
-        return false;
-      }
-
       const user = await findUser(profile.email);
+
+      if (user && user.role != "ADMIN") return false;
 
       if (!user) {
         await addUser(profile.email);
@@ -41,8 +38,8 @@ export const authOptions = {
     },
 
     // This callback will be called based on what happens in SignIn (true/false)
-    async redirect({ url, baseurl }: { url: string; baseurl: string }) {
-      if (url === baseurl) {
+    async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
+      if (url === baseUrl) {
         return `http://localhost:3001/api/auth/error`;
       }
       return url;

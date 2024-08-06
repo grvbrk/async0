@@ -10,10 +10,3 @@ export const getAllTopics = cache(async () => {
     await prisma.$disconnect();
   }
 });
-
-// export const getNeetcodeTopics = cache(async () => {
-//   try {
-//   } catch (error) {
-//     console.log("ERROR FETCHING ALL NEETCODE TOPICS");
-//   }
-// });
