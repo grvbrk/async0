@@ -1,0 +1,24 @@
+services:
+  user:
+    container_name: user
+    restart: always
+    build:
+      context: .
+      dockerfile: ./apps/user/Dockerfile
+    ports:
+      - 3000:3000
+    env_file:
+      - ./apps/user/.env.local
+      - ./.env.docker
+
+  admin:
+    container_name: admin
+    restart: always
+    build:
+      context: .
+      dockerfile: ./apps/admin/Dockerfile
+    ports:
+      - 3001:3001
+    env_file:
+      - ./apps/admin/.env.local
+      - ./.env.docker
