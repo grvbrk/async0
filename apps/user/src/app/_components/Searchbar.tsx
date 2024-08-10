@@ -7,12 +7,14 @@ import { MAX_QUERY_LENGTH } from "@/lib/utils";
 import { Search } from "lucide-react";
 import { toast } from "sonner";
 import SearchDisplay from "./SearchDisplay";
+import useMeasure from "react-use-measure";
 
-export default function Searchbar({ className }: { className?: string }) {
+export default function Searchbar() {
   const [text, setText] = useState<string>("");
   const [showCard, setShowCard] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const debouncedText = useDebounce(text, 0.5);
+  let [ref, { width }] = useMeasure();
 
   useEffect(() => {
     async function fetchData() {
@@ -29,7 +31,7 @@ export default function Searchbar({ className }: { className?: string }) {
     fetchData();
   }, [debouncedText]);
   return (
-    <div className={`${className} ml-auto px-5 md:px-10`}>
+    <div ref={ref}>
       <div
         className="relative"
         onFocus={() => setShowCard(true)}
@@ -51,7 +53,7 @@ export default function Searchbar({ className }: { className?: string }) {
         <Input
           type="search"
           placeholder="Search problem..."
-          className="pl-8 sm:w-[400px] md:w-[300px] lg:w-[450px]"
+          className="pl-8"
           onChange={(e) => {
             let text = e.target.value;
             setShowCard(text.length > 0);
@@ -65,7 +67,10 @@ export default function Searchbar({ className }: { className?: string }) {
         />
       </div>
       {showCard && (
-        <div className="absolute mt-3 w-full sm:w-[400px] md:w-[300px] lg:w-[450px]">
+        <div
+          className={`absolute mt-3`}
+          style={{ width: `${width < 200 ? 200 : width}px` }}
+        >
           <SearchDisplay searchResults={searchResults} />
         </div>
       )}

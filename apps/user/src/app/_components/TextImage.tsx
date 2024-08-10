@@ -15,7 +15,8 @@ export default function TextImage() {
     setMounted(true);
   }, []);
 
-  if (!mounted) return <div className="w-[400px] h-[54.031px]"></div>;
+  if (!mounted)
+    return <div className="w-20 h-20 md:w-[400px] md:h-[54.031px]"></div>;
   return (
     <AnimatePresence>
       <motion.div
@@ -36,7 +37,6 @@ export default function TextImage() {
         <Image
           src={theme === "light" ? text1Dark : text1Light}
           alt="not-a-good-idea"
-          width="400"
           priority
         />
       </motion.div>

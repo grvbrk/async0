@@ -34,17 +34,44 @@ import { Switch } from "@repo/ui/components/ui/switch";
 import { Skeleton } from "@repo/ui/components/ui/skeleton";
 
 import Searchbar from "./Searchbar";
+
 import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from "@repo/ui/components/ui/accordion";
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@repo/ui/components/ui/popover";
+import {
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  Command,
+} from "@repo/ui/components/ui/command";
 
 type ProvidersResponse = Record<
   LiteralUnion<BuiltInProviderType, string>,
   ClientSafeProvider
 >;
+
+type Status = {
+  value: string;
+  label: string;
+};
+
+const statuses: Status[] = [
+  {
+    value: "home",
+    label: "Home",
+  },
+  {
+    value: "problems",
+    label: "Problems",
+  },
+  {
+    value: "neetcode",
+    label: "Neetcode",
+  },
+];
 
 export default function Navbar() {
   const { data: session, status } = useSession();
@@ -52,6 +79,8 @@ export default function Navbar() {
   const pathname = usePathname();
   const [providers, setProviders] = useState<ProvidersResponse | null>(null);
   const [auth0Authenticated, setAuth0Authenticated] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -85,14 +114,45 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 flex h-16 items-center gap-4 border-b px-4 md:px-6 z-10">
-        <div className="flex gap-10 pl-2 text-sm md:pl-4 md:flex md:flex-row md:items-center md:gap-8 lg:gap-12">
+      <header className="sticky top-0 flex h-16 items-center border-b px-4 md:px-6 md:gap-4 z-10">
+        <div className="flex items-center pl-1 text-sm md:pl-4 md:flex md:flex-row md:items-center md:gap-8 lg:gap-12">
           <Link
             href="#"
-            className=" font-bold transition-colors hover:text-primary text-muted-foreground"
+            className="font-bold transition-colors hover:text-primary text-muted-foreground"
           >
             <Sidebar />
           </Link>
+
+          <div className="md:hidden">
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className=" justify-start hover:bg-transparent"
+                >
+                  {selectedStatus ? (
+                    <p className="line-clamp-1 text-muted-foreground">
+                      {selectedStatus.label}
+                    </p>
+                  ) : (
+                    <p className="capitalize line-clamp-1 text-muted-foreground">
+                      {pathname.startsWith("/problems")
+                        ? "Problems"
+                        : pathname.startsWith("/neetcode")
+                          ? "Neetcode"
+                          : "Home"}
+                    </p>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[100px] p-0" align="start">
+                <StatusList
+                  setOpen={setOpen}
+                  setSelectedStatus={setSelectedStatus}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
 
           <Link
             href="/"
@@ -161,7 +221,7 @@ export default function Navbar() {
                       signIn(provider.id);
                     }}
                   >
-                    <LogIn size="16" className="mr-2" />
+                    <LogIn size="16" className="hidden md:block mr-2" />
                     Sign in
                   </Button>
                 );
@@ -171,5 +231,49 @@ export default function Navbar() {
         </div>
       </header>
     </>
+  );
+}
+
+function StatusList({
+  setOpen,
+  setSelectedStatus,
+}: {
+  setOpen: (open: boolean) => void;
+  setSelectedStatus: (status: Status | null) => void;
+}) {
+  return (
+    <Command>
+      <CommandList>
+        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandGroup>
+          {statuses.map((status) => (
+            <Link
+              key={status.value}
+              href={
+                status.value === "home"
+                  ? "/"
+                  : status.value === "problems"
+                    ? "/problems"
+                    : "/neetcode"
+              }
+            >
+              <CommandItem
+                className=" cursor-pointer"
+                value={status.value}
+                onSelect={(value) => {
+                  setSelectedStatus(
+                    statuses.find((priority) => priority.value === value) ||
+                      null
+                  );
+                  setOpen(false);
+                }}
+              >
+                {status.label}
+              </CommandItem>
+            </Link>
+          ))}
+        </CommandGroup>
+      </CommandList>
+    </Command>
   );
 }
