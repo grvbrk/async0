@@ -34,8 +34,8 @@ RUN adduser --system --uid 1001 nextjs
 USER nextjs
 
 EXPOSE 3001
-ENV PORT=3001
 ENV HOSTNAME="0.0.0.0"
+ENV PORT=3001
 
 COPY --from=installer /app/apps/admin/next.config.js .
 COPY --from=installer /app/apps/admin/package.json .

@@ -23,7 +23,7 @@ import {
 } from "@repo/ui/components/ui/dropdown-menu";
 import { Input } from "@repo/ui/components/ui/input";
 
-type ProvidersResponse = Record<
+export type ProvidersResponse = Record<
   LiteralUnion<BuiltInProviderType, string>,
   ClientSafeProvider
 >;
@@ -64,54 +64,42 @@ export default function Navbar() {
             Users
           </Link>
         </nav>
-        <form className="ml-auto flex-1 sm:flex-initial">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search problem..."
-              className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
-            />
-          </div>
-        </form>
-        {session ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="icon" className="rounded-full">
-                <CircleUser className="h-5 w-5" />
-                <span className="sr-only">Toggle user menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Support</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => signOut()}>
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : (
-          providers &&
-          Object.values(providers).map((provider, idx) => {
-            return (
-              <Button
-                key={idx}
-                onClick={() =>
-                  signIn(provider.id, {
-                    callbackUrl: "http://localhost:3001",
-                    redirect: false,
-                  })
-                }
-              >
-                <LogIn size="16" className="mr-2" />
-                Sign up
-              </Button>
-            );
-          })
-        )}
+        <div className="ml-auto">
+          {session ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="rounded-full"
+                >
+                  <CircleUser className="h-5 w-5" />
+                  <span className="sr-only">Toggle user menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem>Support</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => signOut()}>
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            providers &&
+            Object.values(providers).map((provider, idx) => {
+              return (
+                <Button key={idx} onClick={() => signIn(provider.id)}>
+                  <LogIn size="16" className="mr-2" />
+                  Sign up
+                </Button>
+              );
+            })
+          )}
+        </div>
       </header>
     </>
   );
