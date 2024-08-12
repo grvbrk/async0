@@ -12,7 +12,6 @@ export function ToastDestructive() {
     <Button
       variant="outline"
       onClick={() => {
-        console.log("Clicked");
         toast({
           variant: "destructive",
           title: "Uh oh! Something went wrong.",

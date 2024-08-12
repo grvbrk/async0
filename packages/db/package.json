@@ -4,7 +4,6 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "scripts": {
-    "migrate": "node-pg-migrate",
     "db:generate": "prisma generate",
     "db:push": "prisma db push --skip-generate"
   },
@@ -13,8 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@prisma/client": "^5.17.0",
-    "pg": "^8.12.0"
+    "@prisma/client": "^5.17.0"
   },
   "exports": {
     ".": "./src/index.ts"
