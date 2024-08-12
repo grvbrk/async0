@@ -12,7 +12,7 @@ import {
   Settings,
 } from "lucide-react";
 import { editor } from "monaco-editor";
-import { Dispatch, useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import {
@@ -24,16 +24,15 @@ import { Switch } from "@repo/ui/components/ui/switch";
 import { Tabs, TabsList } from "@repo/ui/components/ui/tabs";
 import Counter from "./Counter";
 import { AnimatePresence, motion } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { judge0ValueKeyType } from "@repo/common";
 
 type CodeEditorPropsType = {
   placeholderCode: string;
   handleTestcaseSubmission: (userFunction: string, run: boolean) => void;
   isPending: boolean;
-  problemSubmitStatus: any;
-  setProblemSubmitStatus: Dispatch<any>;
-  problemRunStatus: any;
-  setProblemRunStatus: Dispatch<any>;
+  problemSubmitStatus: judge0ValueKeyType[];
+  setProblemSubmitStatus: Dispatch<SetStateAction<judge0ValueKeyType[]>>;
+  problemRunStatus: judge0ValueKeyType;
   totaltestcases: number;
   passedtestcases: number;
 };
@@ -45,7 +44,6 @@ export default function CodeEditor({
   problemSubmitStatus,
   setProblemSubmitStatus,
   problemRunStatus,
-  setProblemRunStatus,
   totaltestcases,
   passedtestcases,
 }: CodeEditorPropsType) {
@@ -60,7 +58,7 @@ export default function CodeEditor({
   const [lineHeight, setLineHeight] = useState<number>(23);
   const [intellisenseActive, setIntellisenseActive] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
-  const router = useRouter();
+  const consoleRef = useRef<HTMLDivElement>(null);
 
   function handleMount(editor: editor.IStandaloneCodeEditor, monaco: Monaco) {
     editorRef.current = editor;
@@ -84,36 +82,34 @@ export default function CodeEditor({
     });
   }
 
-  function handleSubmit() {
-    if (!session) {
-      toast.error("You need to login first");
-      return;
-    }
-
-    router.refresh();
-    handleTestcaseSubmission(value, false);
-    setProblemRunStatus({});
-    setShowConsole(true);
-    setShowMessages(true);
-    setShowRunData(false);
-  }
-
   function handleRun() {
     if (!session) {
       toast.error("You need to login first");
       return;
     }
     handleTestcaseSubmission(value, true);
-    setProblemSubmitStatus([]);
     setShowConsole(true);
-    setShowMessages(true);
     setShowRunData(true);
+    setShowMessages(!showMessages);
+    setProblemSubmitStatus([]);
+  }
+
+  function handleSubmit() {
+    if (!session) {
+      toast.error("You need to login first");
+      return;
+    }
+
+    handleTestcaseSubmission(value, false);
+    setShowConsole(true);
+    setShowRunData(false);
+    setShowMessages(!showMessages);
   }
 
   function toggleConsole() {
     if (showConsole) {
       setShowConsole(false);
-      setTimeout(() => setShowMessages(false), 300);
+      setShowMessages(false);
     } else {
       setShowConsole(true);
     }
@@ -131,7 +127,6 @@ export default function CodeEditor({
     // element.click();
     // document.body.removeChild(element);
   }
-
   return (
     <>
       <div className="px-4 pt-2">
@@ -274,7 +269,16 @@ export default function CodeEditor({
                 }}
                 className="absolute bottom-0 w-full z-50"
               >
-                <Card className="absolute bottom-0 h-2/5 w-full rounded-md overflow-y-auto border-y-2 border-gray-600 bg-black font-ubuntu-mono text-lg leading-tight z-50 ">
+                <Card
+                  className="absolute bottom-0 h-2/5 w-full rounded-md overflow-y-auto border-y-2 border-gray-600 bg-black font-ubuntu-mono text-lg leading-tight z-50"
+                  onClick={(e) => e.stopPropagation()}
+                  onBlur={(e) => {
+                    setShowConsole(false);
+                    setTimeout(() => setShowMessages(false), 300);
+                  }}
+                  tabIndex={0}
+                  ref={consoleRef}
+                >
                   <CardContent className="mt-4">
                     <ShowResults
                       isPending={isPending}
@@ -334,15 +338,15 @@ function ShowResults({
   passedtestcases,
 }: {
   isPending: boolean;
-  problemSubmitStatus: any;
-  problemRunStatus: any;
+  problemSubmitStatus: judge0ValueKeyType[];
+  problemRunStatus: judge0ValueKeyType;
   showMessages: boolean;
   showRunData: boolean;
   totaltestcases: number;
   passedtestcases: number;
 }) {
-  const [showFirstMessage, setShowFirstMessage] = useState(false);
-  const [showSecondMessage, setShowSecondMessage] = useState(false);
+  const [showFirstMessage, setShowFirstMessage] = useState<boolean>(false);
+  const [showSecondMessage, setShowSecondMessage] = useState<boolean>(false);
 
   useEffect(() => {
     if (showMessages) {
@@ -350,33 +354,13 @@ function ShowResults({
       setShowSecondMessage(false);
       const timer1 = setTimeout(() => setShowFirstMessage(true), 1000);
       const timer2 = setTimeout(() => setShowSecondMessage(true), 2000);
+
       return () => {
         clearTimeout(timer1);
         clearTimeout(timer2);
       };
     }
   }, [showMessages]);
-
-  if (!showMessages) {
-    return (
-      <>
-        {!isPending && showRunData ? (
-          <ShowRunConsole problem={problemRunStatus} />
-        ) : (
-          problemSubmitStatus.map((problem: any, index: number) => {
-            return (
-              <ConsoleData
-                key={index}
-                problem={problem}
-                index={index}
-                error={index === problemSubmitStatus.length - 1}
-              />
-            );
-          })
-        )}
-      </>
-    );
-  }
 
   return (
     <>
@@ -386,107 +370,98 @@ function ShowResults({
       {showSecondMessage && (
         <h1 className="text-gray-300">~ Gathering Results...</h1>
       )}
-      <div className="my-2">
-        {!isPending && showRunData ? (
-          <ShowRunConsole problem={problemRunStatus} />
-        ) : (
-          problemSubmitStatus.map((problem: any, index: number) => {
-            return (
-              <ConsoleData
-                problem={problem}
-                index={index}
-                key={index}
-                error={index === problemSubmitStatus.length - 1}
-              />
-            );
-          })
-        )}
-      </div>
-      {!isPending && !showRunData && !showMessages && (
-        <div
-          className={`${passedtestcases === totaltestcases ? "text-green-400" : passedtestcases === 0 ? "text-red-500" : "text-yellow-600 "} font-bold text-md`}
-        >{`Testcases passed: ${passedtestcases}/${totaltestcases}`}</div>
-      )}
+      {
+        <div className="my-2">
+          {!isPending ? (
+            showRunData ? (
+              <ShowRunConsole problemRunStatus={problemRunStatus} />
+            ) : (
+              <div>
+                {problemSubmitStatus.map(
+                  (problem: judge0ValueKeyType, index: number) => {
+                    return (
+                      <ShowSubmitConsole
+                        key={index}
+                        problem={problem}
+                        index={index}
+                      />
+                    );
+                  }
+                )}
+                <div
+                  className={`mt-2 ${passedtestcases === totaltestcases ? "text-green-400" : passedtestcases === 0 ? "text-red-500" : "text-yellow-600 "} font-bold text-md`}
+                >
+                  {`Testcases passed: ${passedtestcases}/${totaltestcases}`}
+                </div>
+              </div>
+            )
+          ) : null}
+        </div>
+      }
     </>
   );
 }
 
-function ShowRunConsole(problem: any) {
+function ShowRunConsole({
+  problemRunStatus,
+}: {
+  problemRunStatus: judge0ValueKeyType;
+}) {
   return (
     <>
       <pre className="text-sm text-muted-foreground mt-2 text-wrap">
-        {[5, 7, 8, 9, 10, 11, 12].includes(problem.problem.status.id)
-          ? problem.problem.stderr.startsWith("run: ")
-            ? "Either output too big or time limit exceeded"
-            : `Output: ${problem.problem.stdout}`
-          : problem.problem.stdout
-            ? `Output: ${problem.problem.stdout}`
+        {[5, 7, 8, 9, 10, 11, 12].includes(problemRunStatus.status.id)
+          ? problemRunStatus.stderr
+            ? `Error: ${problemRunStatus.stderr}`
+            : "Time limit exceeded"
+          : problemRunStatus.stdout
+            ? `Output: ${problemRunStatus.stdout}`
             : "There are no logs to show. Consider adding 'console.log' statements."}
       </pre>
     </>
   );
 }
 
-function ConsoleData({
+function ShowSubmitConsole({
   problem,
   index,
-  error,
 }: {
-  problem: any;
-  index?: number;
-  error?: boolean;
+  problem: judge0ValueKeyType;
+  index: number;
 }) {
-  return (
-    <>
-      <div className="text-md">
-        <span>
-          {problem.value.status.id === 3 ? (
-            <div className="text-green-400 font-bold text-md">
-              {`~ testcase-${index} PASS `}
-              <span>{`${(problem.value.time * 1000).toFixed(0)}ms `}</span>
-            </div>
-          ) : problem.value.status.id === 4 ? (
-            <>
-              <div className="text-red-500 font-bold text-md">
-                {`~ testcase-${index} FAIL `}
-                <span>{`${(problem.value.time * 1000).toFixed(0)}ms `}</span>
-              </div>
+  const getStatusDisplay = () => {
+    switch (problem.status.id) {
+      case 3:
+        return (
+          <div className="text-green-400 font-bold text-md">{`~ testcase-${index} PASS`}</div>
+        );
+      case 4:
+        return (
+          <>
+            <div className="text-red-500 font-bold text-md">{`~ testcase-${index} FAIL`}</div>
+            {problem.stdout && (
+              <pre className="text-sm text-muted-foreground">{`Output: ${problem.stdout}`}</pre>
+            )}
+            {problem.stderr && (
+              <pre className="text-sm text-muted-foreground">{`Error: ${problem.stderr}`}</pre>
+            )}
+          </>
+        );
+      default:
+        return (
+          <>
+            <div className="text-yellow-600 font-bold text-md">{`~ testcase-${index} TLE`}</div>
+            {problem.stdout ? (
+              <pre className="text-sm text-muted-foreground">{`Output: ${problem.stdout}`}</pre>
+            ) : problem.stderr ? (
+              <pre className="text-sm text-muted-foreground">{`Error: ${problem.stderr}`}</pre>
+            ) : (
+              <pre className="text-sm text-muted-foreground">{`Error: Time Limit Exceeded`}</pre>
+            )}
+          </>
+        );
+    }
+  };
 
-              {error && problem.value.stderr && (
-                <pre className="text-sm text-muted-foreground">
-                  {`Error: ${problem.value.stderr}`}
-                </pre>
-              )}
-              {error && problem.value.stdout && (
-                <pre className="text-sm text-muted-foreground">
-                  {`Your Output: ${problem.value.stdout}`}
-                </pre>
-              )}
-            </>
-          ) : (
-            <>
-              <div className="text-yellow-600 font-bold text-md">
-                {`~ testcase-${index} TLE `}
-                <span className="text-red-500">{`${(problem.value.time * 1000).toFixed(0)}ms `}</span>
-              </div>
-
-              {(error &&
-                problem.value.stderr &&
-                problem.value.stderr.startsWith("run: ")) ||
-              problem.value.status.id === 5 ? (
-                <pre className="text-sm text-muted-foreground text-wrap">
-                  Error: Time Limit Exceeded. Please check if the function isn't
-                  running into an infinite loop.
-                </pre>
-              ) : (
-                <pre className="text-sm text-muted-foreground">
-                  {`Error: ${problem.value.stderr}`}
-                </pre>
-              )}
-            </>
-          )}
-        </span>
-      </div>
-    </>
-  );
+  return <div>{getStatusDisplay()}</div>;
 }

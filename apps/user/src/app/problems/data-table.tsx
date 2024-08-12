@@ -42,6 +42,7 @@ import { Checkbox } from "@repo/ui/components/ui/checkbox";
 import { useSession } from "next-auth/react";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 import { COLUMN_VISIBILITY_BREAKPOINTS } from "@/lib/utils";
+import Card3d from "./_components/Card3d";
 
 type ProblemDetails = userProblemDetailsType | NeetcodeProblemDetails;
 
@@ -58,7 +59,6 @@ export function DataTable<TData extends ProblemDetails>({
   lists,
   allTopics,
 }: DataTableProps<TData>) {
-  console.log(data);
   const { data: session } = useSession();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState({});

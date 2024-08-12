@@ -64,12 +64,27 @@ export const getSidebarData = cache(async () => {
           solved: problem.hasUserSolved.length > 0,
         })),
       }));
-      console.log(transformedData);
       return transformedData;
     }
   } catch (error) {
     console.log("ERRROR FETCHING ALL TOPICS", error);
   } finally {
     await prisma.$disconnect();
+  }
+});
+
+export const getProgressData = cache(async () => {
+  const session = await getServerSession(authOptions);
+  const user = session?.user;
+
+  if (!session || !user) return;
+
+  try {
+    const count = await prisma.hasUserSolved.count({
+      where: { userId: user.id },
+    });
+    return count;
+  } catch (error) {
+    console.log("ERROR GETTING PROGRESS DATA");
   }
 });

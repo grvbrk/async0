@@ -1,7 +1,5 @@
-# Use a Node.js base image
 FROM node:18-alpine AS base
 
-# Install dependencies
 FROM base AS builder
 RUN apk update
 RUN apk add --no-cache libc6-compat
@@ -34,8 +32,8 @@ RUN adduser --system --uid 1001 nextjs
 USER nextjs
 
 EXPOSE 3000
-ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+ENV PORT=3000
 
 COPY --from=installer /app/apps/user/next.config.js .
 COPY --from=installer /app/apps/user/package.json .
@@ -46,19 +44,7 @@ COPY --from=installer --chown=nextjs:nodejs /app/apps/user/public ./apps/user/pu
 
 CMD node apps/user/server.js
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+# _______________________________________________________
 
 # Use a Node.js base image
 # FROM node:18-alpine AS base

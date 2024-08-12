@@ -4,6 +4,7 @@ export const COLUMN_VISIBILITY_BREAKPOINTS = [
     max: 640,
     columns: {
       solutions: false,
+      bookmarks: false,
       difficulty: false,
       topics: false,
       lists: false,
@@ -14,6 +15,7 @@ export const COLUMN_VISIBILITY_BREAKPOINTS = [
     max: 768,
     columns: {
       solutions: false,
+      bookmarks: true,
       difficulty: true,
       topics: true,
       lists: false,
@@ -24,6 +26,7 @@ export const COLUMN_VISIBILITY_BREAKPOINTS = [
     max: 1024,
     columns: {
       solutions: true,
+      bookmarks: true,
       difficulty: true,
       topics: true,
       lists: false,
@@ -34,6 +37,7 @@ export const COLUMN_VISIBILITY_BREAKPOINTS = [
     max: Infinity,
     columns: {
       solutions: true,
+      bookmarks: true,
       difficulty: true,
       topics: true,
       lists: true,

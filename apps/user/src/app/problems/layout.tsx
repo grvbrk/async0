@@ -1,6 +1,7 @@
-import Searchbar from "../_components/Searchbar";
+import { Suspense } from "react";
 import BreadCrumbs from "./_components/BreadCrumbs";
-
+import "ldrs/leapfrog";
+import CustomLoader from "./_components/CustomLoader";
 export default async function ProblemsLayout({
   children,
 }: {
@@ -8,12 +9,19 @@ export default async function ProblemsLayout({
 }) {
   return (
     <>
-      <div>
+      <div className="flex flex-col flex-grow relative">
         <div className="flex items-center">
           <BreadCrumbs />
-          <Searchbar className="lg:hidden ml-auto mt-5" />
         </div>
-        {children}
+        <Suspense
+          fallback={
+            <div className="absolute flex h-full w-full justify-center items-center ">
+              <CustomLoader />
+            </div>
+          }
+        >
+          {children}
+        </Suspense>
       </div>
     </>
   );

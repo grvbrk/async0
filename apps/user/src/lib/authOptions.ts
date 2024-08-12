@@ -2,10 +2,11 @@ import { addUser, findUser } from "@/app/actions/users";
 import GoogleProvider from "next-auth/providers/google";
 
 export const authOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      clientId: process.env.GOOGLE_CLIENT_ID_USER as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET_USER as string,
       authorization: {
         params: {
           prompt: "consent",
@@ -34,8 +35,5 @@ export const authOptions = {
       session.user.foo = "bar";
       return session;
     },
-  },
-  pages: {
-    signIn: "/test",
   },
 };

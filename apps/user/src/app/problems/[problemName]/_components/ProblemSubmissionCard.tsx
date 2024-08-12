@@ -81,7 +81,9 @@ export default function ProblemSubmissionCard({
                   return (
                     <TableRow key={index}>
                       <TableCell className="text-center">
-                        <div className="font-medium">
+                        <div
+                          className={`font-medium ${sub.status === "Accepted" ? "text-green-600" : sub.status === "Rejected" ? "text-red-600" : "text-yellow-600"}`}
+                        >
                           {sub.status === "Accepted"
                             ? "Pass"
                             : sub.status === "Rejected"

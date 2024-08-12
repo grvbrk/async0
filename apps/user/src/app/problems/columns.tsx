@@ -65,7 +65,7 @@ export function useUserProblemColumns(): ColumnDef<userProblemDetailsType>[] {
               totalTestcases: number;
             };
           }[];
-          const isSolved = userSolvedStatus.length > 0;
+          const isSolved = userSolvedStatus && userSolvedStatus.length > 0;
 
           return (
             <div className="flex justify-center">

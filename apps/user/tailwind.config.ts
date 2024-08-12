@@ -10,8 +10,7 @@ const config = {
     "../../packages/ui/**/*{.js,.ts,.jsx,.tsx}",
     "../../packages/common/**/*{.js,.ts,.jsx,.tsx}",
   ],
-  prefix: "",
-
+  safelist: ["no-scrollbar"],
   theme: {
     container: {
       center: true,

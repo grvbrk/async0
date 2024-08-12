@@ -6,6 +6,7 @@ import UserBookmarkedProblems from "./_components/UserBookmarkedProblems";
 import UserUpvotedSolution from "./_components/UserUpvotedSolution";
 import { getAllSavedSolutions } from "../actions/solutions";
 import { getAllBookmarkedProblems } from "../actions/bookmarks";
+import Card3D from "./_components/Card3d";
 
 export default async function ProblemsPage() {
   const userProblemDetails = await getAllGeneralProblems();
@@ -21,14 +22,14 @@ export default async function ProblemsPage() {
     <>
       <div className="container flex flex-col gap-10 items-center xl:flex-row xl:items-start mt-5">
         <div className="flex flex-col md:flex-row md:gap-5 md:items-center xl:flex-col">
-          <div className="mb-5">
+          <Card3D className="mb-5 ">
             <UserBookmarkedProblems
               bookmarkedProblems={bookmarkedProblems ?? []}
             />
-          </div>
-          <div>
+          </Card3D>
+          <Card3D>
             <UserUpvotedSolution savedSolutions={savedSolutions ?? []} />
-          </div>
+          </Card3D>
         </div>
         <div>
           <DataTable

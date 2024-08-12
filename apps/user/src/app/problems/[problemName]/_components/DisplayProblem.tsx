@@ -11,7 +11,7 @@ import { BookOpen, Code, NotebookText } from "lucide-react";
 import CodeEditor from "./CodeEditor";
 import { useState, useTransition } from "react";
 import { codeSubmission } from "@/app/actions/codeSubmission";
-import { unescapeCode } from "@repo/common";
+import { judge0ValueKeyType, unescapeCode } from "@repo/common";
 import AnimatePanel from "./AnimatePanel";
 import ProblemInfoCard from "./ProblemInfoCard";
 import ProblemSolutionCard from "./ProblemSolutionCard";
@@ -23,6 +23,7 @@ import {
   UserSolution,
 } from "@repo/db";
 import ProblemSubmissionCard from "./ProblemSubmissionCard";
+import { toast } from "sonner";
 
 export type SolutionWithCounts = Solution & {
   _count: {
@@ -60,12 +61,16 @@ export default function DisplayProblem({
   submissions: (Submission & { userSolution: UserSolution | null })[];
   problemName: string;
 }) {
-  const [problemSubmitStatus, setProblemSubmitStatus] = useState<any>([]);
-  const [problemRunStatus, setProblemRunStatus] = useState<any>({});
+  const [problemSubmitStatus, setProblemSubmitStatus] = useState<
+    judge0ValueKeyType[]
+  >([]);
+  const [problemRunStatus, setProblemRunStatus] =
+    useState<judge0ValueKeyType>();
   const [errorIndex, setErrorIndex] = useState<number>(0);
   const [isPending, startTransition] = useTransition();
   const [activeTab, setActiveTab] = useState<string>("problem");
   const [direction, setDirection] = useState<"left" | "right">("left");
+
   function handleTabChange(newTab: string) {
     const tabOrder = ["problem", "solution", "submission"];
     const currentIndex = tabOrder.indexOf(activeTab);
@@ -79,6 +84,7 @@ export default function DisplayProblem({
 
     setActiveTab(newTab);
   }
+
   async function handleTestcaseSubmission(userFunction: string, run: boolean) {
     startTransition(async () => {
       // response variable gets the final result from judge0
@@ -88,21 +94,27 @@ export default function DisplayProblem({
         problemName,
         run
       );
-      if (response && Array.isArray(response)) {
-        const firstErrorIndex = response.findIndex((problem: any) =>
-          [4, 5, 6, 7, 8, 9, 10, 11, 12].includes(problem.value.status.id)
-        );
-        setErrorIndex(firstErrorIndex);
-        const problemsToShow =
-          firstErrorIndex !== -1
-            ? response.slice(0, firstErrorIndex + 1)
-            : response;
-        setProblemSubmitStatus(problemsToShow);
+      if (response) {
+        if (Array.isArray(response)) {
+          const firstErrorIndex = response.findIndex(
+            (problem: judge0ValueKeyType) =>
+              [4, 5, 6, 7, 8, 9, 10, 11, 12].includes(problem.status.id)
+          );
+          setErrorIndex(firstErrorIndex);
+          const problemsToShow =
+            firstErrorIndex != -1
+              ? response.slice(0, firstErrorIndex + 1)
+              : response;
+          setProblemSubmitStatus(problemsToShow);
+        } else {
+          setProblemRunStatus(response);
+        }
       } else {
-        setProblemRunStatus(response);
+        toast.error("Something went wrong...");
       }
     });
   }
+
   return (
     <ResizablePanelGroup
       direction="horizontal"
@@ -160,10 +172,11 @@ export default function DisplayProblem({
           isPending={isPending}
           problemSubmitStatus={problemSubmitStatus}
           setProblemSubmitStatus={setProblemSubmitStatus}
-          problemRunStatus={problemRunStatus}
-          setProblemRunStatus={setProblemRunStatus}
+          problemRunStatus={problemRunStatus as judge0ValueKeyType}
           totaltestcases={problem?.testcases.length as number}
-          passedtestcases={errorIndex}
+          passedtestcases={
+            errorIndex === -1 ? problem!.testcases.length : errorIndex
+          }
         />
       </ResizablePanel>
     </ResizablePanelGroup>

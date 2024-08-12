@@ -5,7 +5,7 @@ import { Card } from "@repo/ui/components/ui/card";
 import { Separator } from "@repo/ui/components/ui/separator";
 import { Testcase } from "@repo/db";
 import { Check, LoaderCircle, TriangleAlert, X } from "lucide-react";
-import { unescapeCode } from "@repo/common";
+import { judge0ValueKeyType, unescapeCode } from "@repo/common";
 
 export default function TestCaseBlock({
   testcase,
@@ -15,20 +15,18 @@ export default function TestCaseBlock({
 }: {
   testcase: Testcase;
   index: number;
-  problemSubmitStatus: any;
+  problemSubmitStatus: judge0ValueKeyType;
   isPending: boolean;
 }) {
   return (
     <Card
       className={`${
         problemSubmitStatus
-          ? problemSubmitStatus.value.status.id === 3
+          ? problemSubmitStatus.status.id === 3
             ? " border-green-600"
-            : problemSubmitStatus.value.status.id === 4
+            : problemSubmitStatus.status.id === 4
               ? " border-red-600"
-              : [5, 6, 7, 8, 9, 10, 11].includes(
-                    problemSubmitStatus.value.status.id
-                  )
+              : [5, 6, 7, 8, 9, 10, 11].includes(problemSubmitStatus.status.id)
                 ? " border-yellow-600"
                 : ""
           : ""
@@ -38,12 +36,12 @@ export default function TestCaseBlock({
         <code
           className={`${
             problemSubmitStatus
-              ? problemSubmitStatus.value.status.id === 3
+              ? problemSubmitStatus.status.id === 3
                 ? "text-green-600"
-                : problemSubmitStatus.value.status.id === 4
+                : problemSubmitStatus.status.id === 4
                   ? "text-red-600"
                   : [5, 6, 7, 8, 9, 10, 11].includes(
-                        problemSubmitStatus.value.status.id
+                        problemSubmitStatus.status.id
                       )
                     ? "text-yellow-600"
                     : ""
@@ -55,12 +53,12 @@ export default function TestCaseBlock({
         {isPending ? (
           <LoaderCircle className="animate-spin size-5" />
         ) : problemSubmitStatus ? (
-          problemSubmitStatus.value.status.id === 3 ? (
+          problemSubmitStatus.status.id === 3 ? (
             <Check className="text-green-600 size-5" />
-          ) : problemSubmitStatus.value.status.id === 4 ? (
+          ) : problemSubmitStatus.status.id === 4 ? (
             <X className="text-red-600 size-5" />
           ) : [5, 6, 7, 8, 9, 10, 11].includes(
-              problemSubmitStatus.value.status.id
+              problemSubmitStatus.status.id
             ) ? (
             <TriangleAlert className="text-yellow-600 size-5" />
           ) : null

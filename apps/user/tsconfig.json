@@ -26,7 +26,9 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".next/types/app/problems/[problem_id]/page.tsx"
+    ".next/types/app/problems/[problem_id]/page.tsx",
+    "../../packages/ui/src/components/ui/CodeBlock.tsx",
+    "src/userCode/driverCode.js"
   ],
   "exclude": ["node_modules"]
 }
