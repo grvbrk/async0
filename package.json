@@ -1,5 +1,5 @@
 {
-  "name": "Async0",
+  "name": "async0",
   "private": true,
   "scripts": {
     "build": "turbo build",
@@ -8,9 +8,6 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
-    "eslint": "^8.57.0",
     "prettier": "^3.2.5",
     "turbo": "^2.0.3"
   },

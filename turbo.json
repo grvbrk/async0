@@ -8,6 +8,7 @@
       "persistent": true
     },
     "build": {
+      "env": [],
       "dependsOn": ["^build", "^db:generate"],
       "outputs": [".next/**", "!.next/cache/**"]
     },

@@ -11,6 +11,7 @@ node_modules
 .env.development.local
 .env.test.local
 .env.production.local
+.env.docker
 
 # Testing
 coverage
@@ -26,6 +27,7 @@ coverage
 out/
 build
 dist
+backup1.sql
 
 
 # Debug
@@ -38,6 +40,11 @@ yarn-error.log*
 *.pem
 
 sql-insert.txt
+images/
 driver-code/
 problem-ui/
+solution-ui/
 test/
+db.json
+
+db_backups/
