@@ -31,6 +31,7 @@ model Problem {
   updatedAt             DateTime                 @default(now()) @updatedAt
   starterCode           String
   link                  String?
+  rank                  Int?
   search_vector         Unsupported("tsvector")?
   bookmarks             Bookmark[]
   solutions             Solution[]
