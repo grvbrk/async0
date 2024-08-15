@@ -7,7 +7,13 @@ import {
 } from "@repo/ui/components/ui/resizable";
 
 import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/ui/tabs";
-import { BookOpen, Code, NotebookText } from "lucide-react";
+import {
+  BookOpen,
+  ChevronsLeft,
+  ChevronsRight,
+  Code,
+  NotebookText,
+} from "lucide-react";
 import CodeEditor from "./CodeEditor";
 import { useState, useTransition } from "react";
 import { codeSubmission } from "@/app/actions/codeSubmission";
@@ -17,6 +23,7 @@ import ProblemInfoCard from "./ProblemInfoCard";
 import ProblemSolutionCard from "./ProblemSolutionCard";
 import {
   Bookmark,
+  Problem,
   Solution,
   Submission,
   Testcase,
@@ -24,40 +31,22 @@ import {
 } from "@repo/db";
 import ProblemSubmissionCard from "./ProblemSubmissionCard";
 import { toast } from "sonner";
-
-export type SolutionWithCounts = Solution & {
-  _count: {
-    likes: number;
-    dislikes: number;
-  };
-  savedBy?: { id: string }[];
-  likes?: { id: string }[];
-  dislikes?: { id: string }[];
-  isSaved?: boolean;
-  isLiked?: boolean;
-  isDisliked?: boolean;
-};
-
-export type DisplayProblemPropType =
-  | {
-      id: string;
-      name: string;
-      link: string | null;
-      difficulty: string;
-      starterCode: string;
-      solutions: SolutionWithCounts[];
-      testcases: Testcase[];
-      bookmarks?: Bookmark[];
-    }
-  | null
-  | undefined;
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@repo/ui/components/ui/tooltip";
+import Card3D from "../../_components/Card3d";
+import { DisplayProblemType } from "../page";
+import Link from "next/link";
 
 export default function DisplayProblem({
   problem,
   submissions,
   problemName,
 }: {
-  problem: DisplayProblemPropType;
+  problem: DisplayProblemType;
   submissions: (Submission & { userSolution: UserSolution | null })[];
   problemName: string;
 }) {
@@ -116,69 +105,107 @@ export default function DisplayProblem({
   }
 
   return (
-    <ResizablePanelGroup
-      direction="horizontal"
-      className="md:px-5 grid grid-cols-2 "
-    >
-      <ResizablePanel defaultSize={45} minSize={25}>
-        <Tabs defaultValue="problem" className="p-4">
-          <TabsList className="flex justify-around w-full bg-transparent mb-2 ">
-            <TabsTrigger
-              value="problem"
-              className="w-full data-[state=active]:bg-foreground data-[state=active]:text-background"
-              onClick={() => handleTabChange("problem")}
-            >
-              <BookOpen />
-            </TabsTrigger>
-            <TabsTrigger
-              value="solution"
-              className="w-full data-[state=active]:bg-foreground data-[state=active]:text-background"
-              onClick={() => {
-                handleTabChange("solution");
-              }}
-            >
-              <Code />
-            </TabsTrigger>
-            <TabsTrigger
-              value="submission"
-              className="w-full data-[state=active]:bg-foreground data-[state=active]:text-background"
-              onClick={() => {
-                handleTabChange("submission");
-              }}
-            >
-              <NotebookText />
-            </TabsTrigger>
-          </TabsList>
-          <AnimatePanel direction={direction} activeTab={activeTab}>
-            {activeTab === "problem" ? (
-              <ProblemInfoCard
-                problem={problem!}
-                isPending={isPending}
-                problemSubmitStatus={problemSubmitStatus}
-              />
-            ) : activeTab === "solution" ? (
-              <ProblemSolutionCard problem={problem!} />
-            ) : (
-              <ProblemSubmissionCard submissions={submissions} />
-            )}
-          </AnimatePanel>
-        </Tabs>
-      </ResizablePanel>
-      <ResizableHandle className="hidden md:block w-1 bg-muted hover:bg-muted-foreground -z-10" />
-      <ResizablePanel minSize={20} defaultSize={55} className="hidden md:block">
-        <CodeEditor
-          placeholderCode={unescapeCode(problem?.starterCode || "") || ""}
-          handleTestcaseSubmission={handleTestcaseSubmission}
-          isPending={isPending}
-          problemSubmitStatus={problemSubmitStatus}
-          setProblemSubmitStatus={setProblemSubmitStatus}
-          problemRunStatus={problemRunStatus as judge0ValueKeyType}
-          totaltestcases={problem?.testcases.length as number}
-          passedtestcases={
-            errorIndex === -1 ? problem!.testcases.length : errorIndex
-          }
-        />
-      </ResizablePanel>
-    </ResizablePanelGroup>
+    <div className="relative">
+      {problem && problem.lowerRankProblemName && (
+        <Link href={problem.lowerRankProblemName.split(" ").join("-")}>
+          <Card3D className="absolute z-10 top-1/4 h-1/2 ml-2 flex items-center text-muted-foreground hover:text-primary  cursor-pointer rounded-lg hover:bg-secondary hover:border">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger className="p-2 h-full">
+                  <ChevronsLeft />
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  {problem.lowerRankProblemName}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </Card3D>
+        </Link>
+      )}
+      {problem && problem.higherRankProblemName && (
+        <Link href={problem.higherRankProblemName.split(" ").join("-")}>
+          <Card3D className="absolute z-10 right-0 top-1/4 h-1/2 mr-2 flex items-center text-muted-foreground hover:text-primary cursor-pointer rounded-lg hover:bg-secondary hover:border">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger className="p-2 h-full">
+                  <ChevronsRight />
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  {problem.higherRankProblemName}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </Card3D>
+        </Link>
+      )}
+      <ResizablePanelGroup
+        direction="horizontal"
+        className="md:px-5 grid grid-cols-2 "
+      >
+        <ResizablePanel defaultSize={45} minSize={25}>
+          <Tabs defaultValue="problem" className="p-4">
+            <TabsList className="flex justify-around w-full bg-transparent mb-2 ">
+              <TabsTrigger
+                value="problem"
+                className="w-full data-[state=active]:bg-foreground data-[state=active]:text-background"
+                onClick={() => handleTabChange("problem")}
+              >
+                <BookOpen />
+              </TabsTrigger>
+              <TabsTrigger
+                value="solution"
+                className="w-full data-[state=active]:bg-foreground data-[state=active]:text-background"
+                onClick={() => {
+                  handleTabChange("solution");
+                }}
+              >
+                <Code />
+              </TabsTrigger>
+              <TabsTrigger
+                value="submission"
+                className="w-full data-[state=active]:bg-foreground data-[state=active]:text-background"
+                onClick={() => {
+                  handleTabChange("submission");
+                }}
+              >
+                <NotebookText />
+              </TabsTrigger>
+            </TabsList>
+            <AnimatePanel direction={direction} activeTab={activeTab}>
+              {activeTab === "problem" ? (
+                <ProblemInfoCard
+                  problem={problem!}
+                  isPending={isPending}
+                  problemSubmitStatus={problemSubmitStatus}
+                />
+              ) : activeTab === "solution" ? (
+                <ProblemSolutionCard problem={problem!} />
+              ) : (
+                <ProblemSubmissionCard submissions={submissions} />
+              )}
+            </AnimatePanel>
+          </Tabs>
+        </ResizablePanel>
+        <ResizableHandle className="hidden md:block w-1 bg-muted hover:bg-muted-foreground -z-10" />
+        <ResizablePanel
+          minSize={20}
+          defaultSize={55}
+          className="hidden md:block"
+        >
+          <CodeEditor
+            placeholderCode={unescapeCode(problem?.starterCode || "") || ""}
+            handleTestcaseSubmission={handleTestcaseSubmission}
+            isPending={isPending}
+            problemSubmitStatus={problemSubmitStatus}
+            setProblemSubmitStatus={setProblemSubmitStatus}
+            problemRunStatus={problemRunStatus as judge0ValueKeyType}
+            totaltestcases={problem?.testcases.length as number}
+            passedtestcases={
+              errorIndex === -1 ? problem!.testcases.length : errorIndex
+            }
+          />
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </div>
   );
 }

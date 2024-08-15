@@ -7,7 +7,6 @@ import {
   CardDescription,
 } from "@repo/ui/components/ui/card";
 import React, { startTransition, useOptimistic, useTransition } from "react";
-import { DisplayProblemPropType, SolutionWithCounts } from "./DisplayProblem";
 import { ThumbsUp, ThumbsDown, Heart } from "lucide-react";
 import CodeBlock from "@repo/ui/components/ui/CodeBlock";
 import { useTheme } from "next-themes";
@@ -18,9 +17,21 @@ import {
   toggleSolutionSave,
 } from "@/app/actions/solutions";
 import { toast } from "sonner";
+import { DisplayProblemType } from "../page";
+import { Solution } from "@repo/db";
 
 type ProblemSolutionCardProps = {
-  problem: DisplayProblemPropType;
+  problem: DisplayProblemType;
+};
+
+type SolutionWithCounts = Solution & {
+  _count: {
+    likes: number;
+    dislikes: number;
+  };
+  isSaved: boolean;
+  isLiked: boolean;
+  isDisliked: boolean;
 };
 
 export default function ProblemSolutionCard({

@@ -9,7 +9,6 @@ import {
 } from "@repo/ui/components/ui/card";
 import React, { useEffect, useState } from "react";
 import TestCaseBlock from "./TestCaseBlock";
-import { DisplayProblemPropType } from "./DisplayProblem";
 import { problemDescriptions } from "@repo/common";
 import { Badge } from "@repo/ui/components/ui/badge";
 import { useTheme } from "next-themes";
@@ -18,9 +17,10 @@ import { toggleBookmark } from "@/app/actions/bookmarks";
 import { useSession } from "next-auth/react";
 import { Skeleton } from "@repo/ui/components/ui/skeleton";
 import Link from "next/link";
+import { DisplayProblemType } from "../page";
 
 type ProblemInfoCardProps = {
-  problem: DisplayProblemPropType;
+  problem: DisplayProblemType;
   isPending: boolean;
   problemSubmitStatus: any;
 };

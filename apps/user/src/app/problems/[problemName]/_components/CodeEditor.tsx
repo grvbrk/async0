@@ -58,7 +58,6 @@ export default function CodeEditor({
   const [lineHeight, setLineHeight] = useState<number>(23);
   const [intellisenseActive, setIntellisenseActive] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
-  const consoleRef = useRef<HTMLDivElement>(null);
 
   function handleMount(editor: editor.IStandaloneCodeEditor, monaco: Monaco) {
     editorRef.current = editor;
@@ -272,12 +271,6 @@ export default function CodeEditor({
                 <Card
                   className="absolute bottom-0 h-2/5 w-full rounded-md overflow-y-auto border-y-2 border-gray-600 bg-black font-ubuntu-mono text-lg leading-tight z-50"
                   onClick={(e) => e.stopPropagation()}
-                  onBlur={(e) => {
-                    setShowConsole(false);
-                    setTimeout(() => setShowMessages(false), 300);
-                  }}
-                  tabIndex={0}
-                  ref={consoleRef}
                 >
                   <CardContent className="mt-4">
                     <ShowResults
@@ -347,6 +340,7 @@ function ShowResults({
 }) {
   const [showFirstMessage, setShowFirstMessage] = useState<boolean>(false);
   const [showSecondMessage, setShowSecondMessage] = useState<boolean>(false);
+  const [showFinalMessage, setShowFinalMessage] = useState<boolean>(false);
 
   useEffect(() => {
     if (showMessages) {
@@ -354,10 +348,12 @@ function ShowResults({
       setShowSecondMessage(false);
       const timer1 = setTimeout(() => setShowFirstMessage(true), 1000);
       const timer2 = setTimeout(() => setShowSecondMessage(true), 2000);
+      const timer3 = setTimeout(() => setShowFinalMessage(true), 2600);
 
       return () => {
         clearTimeout(timer1);
         clearTimeout(timer2);
+        clearTimeout(timer3);
       };
     }
   }, [showMessages]);
@@ -370,7 +366,7 @@ function ShowResults({
       {showSecondMessage && (
         <h1 className="text-gray-300">~ Gathering Results...</h1>
       )}
-      {
+      {showFinalMessage && (
         <div className="my-2">
           {!isPending ? (
             showRunData ? (
@@ -397,7 +393,7 @@ function ShowResults({
             )
           ) : null}
         </div>
-      }
+      )}
     </>
   );
 }
