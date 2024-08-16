@@ -10,6 +10,7 @@ export const getAllGeneralProblems = cache(async () => {
   const user = session?.user;
   try {
     const problems = await prisma.problem.findMany({
+      orderBy: { rank: "asc" },
       select: {
         id: true,
         name: true,
@@ -178,6 +179,18 @@ export const getDisplayProblemInfo = cache(async (problemName: string) => {
       },
     });
     if (problem) {
+      const higherRankProblem = await prisma.problem.findFirst({
+        where: { rank: { gt: problem.rank as number } },
+        orderBy: { rank: "asc" },
+        select: { name: true },
+      });
+
+      const lowerRankProblem = await prisma.problem.findFirst({
+        where: { rank: { lt: problem.rank as number } },
+        orderBy: { rank: "desc" },
+        select: { name: true },
+      });
+
       if (problem.solutions) {
         problem.solutions = problem.solutions.map((solution) => ({
           ...solution,
@@ -194,6 +207,10 @@ export const getDisplayProblemInfo = cache(async (problemName: string) => {
         //@ts-ignore
         delete problem.hasUserSolved;
       }
+      //@ts-ignore
+      problem.higherRankProblemName = higherRankProblem?.name || null;
+      //@ts-ignore
+      problem.lowerRankProblemName = lowerRankProblem?.name || null;
     }
 
     return problem;

@@ -44,7 +44,7 @@ export const getSidebarData = cache(async () => {
     if (!session || !user) {
       const data = await prisma.topic.findMany({
         include: {
-          problems: true,
+          problems: { orderBy: { rank: "asc" } },
         },
       });
       return data;
@@ -52,6 +52,7 @@ export const getSidebarData = cache(async () => {
       const data = await prisma.topic.findMany({
         include: {
           problems: {
+            orderBy: { rank: "asc" },
             include: { hasUserSolved: { where: { userId: user.id } } },
           },
         },

@@ -21,15 +21,11 @@ export default async function ProblemsPage() {
   return (
     <>
       <div className="container flex flex-col gap-10 items-center xl:flex-row xl:items-start mt-5">
-        <div className="flex flex-col md:flex-row md:gap-5 md:items-center xl:flex-col">
-          <Card3D className="mb-5 ">
-            <UserBookmarkedProblems
-              bookmarkedProblems={bookmarkedProblems ?? []}
-            />
-          </Card3D>
-          <Card3D>
-            <UserUpvotedSolution savedSolutions={savedSolutions ?? []} />
-          </Card3D>
+        <div className="flex flex-col gap-5 md:flex-row xl:flex-col">
+          <UserBookmarkedProblems
+            bookmarkedProblems={bookmarkedProblems ?? []}
+          />
+          <UserUpvotedSolution savedSolutions={savedSolutions ?? []} />
         </div>
         <div>
           <DataTable

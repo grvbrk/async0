@@ -3,15 +3,16 @@
 import axios from "axios";
 import { cache } from "react";
 import { judge0ValueKeyType, problemDriverCode } from "@repo/common";
-import { DisplayProblemPropType } from "../problems/[problemName]/_components/DisplayProblem";
+
 import { runCode } from "./runCode";
 import { requestBody } from "@repo/common/driver/types";
 import { createSubmission } from "./submissions";
+import { DisplayProblemType } from "../problems/[problemName]/page";
 
 export const codeSubmission = cache(
   async (
     userFunction: string,
-    problem: DisplayProblemPropType,
+    problem: DisplayProblemType,
     problemName: string,
     run: boolean
   ) => {
@@ -44,7 +45,7 @@ export const codeSubmission = cache(
             token: null,
             compile_output: null,
             message: null,
-            status: { id: 11, description: null },
+            status: { id: 69, description: null },
             output: null,
           });
         }
@@ -59,23 +60,40 @@ export const codeSubmission = cache(
             token: null,
             compile_output: null,
             message: null,
-            status: { id: 11, description: null },
+            status: { id: 69, description: null },
             output: null,
           });
         }
+
         return Promise.resolve({
           stdout: null,
           time: null,
           memory: null,
-          stderr: "Something went wrong...",
+          stderr: "Something went wrong!",
           token: null,
           compile_output: null,
           message: null,
-          status: { id: 11, description: null },
+          status: { id: 69, description: null },
           output: null,
         });
       }
     } else {
+      if (!problemDriverCode[problemName]) {
+        return Promise.resolve([
+          {
+            stdout: null,
+            time: null,
+            memory: null,
+            stderr:
+              "Driver code for this problem has not been written yet. Please try again later.",
+            token: null,
+            compile_output: null,
+            message: null,
+            status: { id: 69, description: null },
+            output: null,
+          },
+        ]);
+      }
       const batchSubmission: requestBody = problemDriverCode[problemName](
         userFunction,
         problem?.testcases || []
@@ -133,7 +151,7 @@ export const codeSubmission = cache(
               token: null,
               compile_output: null,
               message: null,
-              status: { id: 11, description: null },
+              status: { id: 69, description: null },
               output: null,
             },
           ]);
@@ -150,7 +168,7 @@ export const codeSubmission = cache(
               token: null,
               compile_output: null,
               message: null,
-              status: { id: 11, description: null },
+              status: { id: 69, description: null },
               output: null,
             },
           ]);
@@ -161,11 +179,11 @@ export const codeSubmission = cache(
             stdout: null,
             time: null,
             memory: null,
-            stderr: "Something went wrong...",
+            stderr: "Something went wrong!",
             token: null,
             compile_output: null,
             message: null,
-            status: { id: 11, description: null },
+            status: { id: 69, description: null },
             output: null,
           },
         ]);
@@ -183,7 +201,7 @@ export async function checkPromiseStatus(
         `${process.env.NEXT_PUBLIC_JUDGE0_URL}/submissions/${token}?base64_encoded=false`
       );
 
-      if ([3, 4, 5, 7, 8, 9, 10, 11, 12].includes(response.data.status.id)) {
+      if ([3, 4, 5, 7, 8, 9, 10, 69, 12].includes(response.data.status.id)) {
         clearInterval(intervalId);
         resolve(response.data);
       }

@@ -31,7 +31,13 @@ export default function HeroImage() {
         }}
       >
         <Image
-          src={theme === "light" ? JobStressBlack : JobStressWhite}
+          src={
+            theme
+              ? theme === "light"
+                ? JobStressBlack
+                : JobStressWhite
+              : JobStressBlack
+          }
           alt="stress"
           className="h-auto w-[1000px]"
           priority

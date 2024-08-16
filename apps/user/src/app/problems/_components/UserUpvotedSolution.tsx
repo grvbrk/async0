@@ -19,6 +19,7 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import React, { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import Card3D from "./Card3d";
 
 export default function UserUpvotedSolution({
   savedSolutions,
@@ -43,8 +44,8 @@ export default function UserUpvotedSolution({
   }, []);
 
   return (
-    <div>
-      <Card className="w-[350px] max-h-80 overflow-y-auto">
+    <Card3D>
+      <Card className="w-[350px] max-h-80 overflow-y-auto h-full">
         <CardHeader>
           <CardTitle>Solutions</CardTitle>
           <CardDescription>
@@ -103,6 +104,6 @@ export default function UserUpvotedSolution({
           )}
         </CardContent>
       </Card>
-    </div>
+    </Card3D>
   );
 }

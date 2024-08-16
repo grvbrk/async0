@@ -5,7 +5,7 @@ import HeroImage from "./_components/HeroImage";
 export default function Home() {
   return (
     <>
-      <div className="border flex flex-1 justify-center pt-28 relative lg:pt-0 lg:flex lg:flex-col lg:justify-center">
+      <div className="flex flex-1 justify-center pt-28 relative lg:pt-0 lg:flex lg:flex-col lg:justify-center">
         <div className="flex flex-col h-full w-fit px-10 lg:ml-52">
           <h1 className="text-4xl leading-7 font-extrabold lg:text-7xl lg:leading-10">
             Solve problems

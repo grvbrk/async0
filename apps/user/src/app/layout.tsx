@@ -19,7 +19,7 @@ const firaCode = Fira_Code({
 });
 
 export const metadata: Metadata = {
-  title: "Async0",
+  title: "Λsync0",
   description: "Solve Data Structures and Algorithm in Javascript",
 };
 

@@ -28,7 +28,7 @@ import {
   AvatarImage,
 } from "@repo/ui/components/ui/avatar";
 import { usePathname } from "next/navigation";
-import Sidebar from "../problems/_components/Sidebar";
+import Sidebar from "./Sidebar";
 import { useTheme } from "next-themes";
 import { Switch } from "@repo/ui/components/ui/switch";
 import { Skeleton } from "@repo/ui/components/ui/skeleton";
@@ -114,8 +114,8 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 flex h-16 items-center border-b px-4 md:px-6 md:gap-4 z-10">
-        <div className="flex items-center pl-1 text-sm md:pl-4 md:flex md:flex-row md:items-center md:gap-8 lg:gap-12">
+      <header className="sticky top-0 flex h-16 items-center border-b px-4 md:px-6 md:gap-4 z-10 bg-background">
+        <div className="flex items-center pl-1 text-sm md:px-4 md:flex md:flex-row md:items-center md:gap-8 lg:gap-12">
           <Link
             href="#"
             className="font-bold transition-colors hover:text-primary text-muted-foreground"
@@ -158,7 +158,7 @@ export default function Navbar() {
             href="/"
             className={`hidden md:block font-black text-foreground transition-colors hover:text-primary ${pathname === "/" && "text-primary"}`}
           >
-            Async0
+            Λsync0
           </Link>
 
           <Link

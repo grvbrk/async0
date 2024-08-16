@@ -9,6 +9,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@repo/ui/components/ui/breadcrumb";
+import Link from "next/link";
 
 export default function BreadCrumbs() {
   const pathname = usePathname();
@@ -27,8 +28,10 @@ export default function BreadCrumbs() {
             return (
               <React.Fragment key={index}>
                 <BreadcrumbItem>
-                  <BreadcrumbLink className="capitalize" href={`${path}`}>
-                    {index === 0 ? "Home" : path.split("/").pop()}
+                  <BreadcrumbLink className="capitalize" asChild>
+                    <Link href={`${path}`}>
+                      {index === 0 ? "Home" : path.split("/").pop()}
+                    </Link>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 {index != pathsArray.length - 1 && <BreadcrumbSeparator />}

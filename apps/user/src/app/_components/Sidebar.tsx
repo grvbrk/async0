@@ -55,7 +55,7 @@ function Sidebar() {
 
       <SheetContent side="left" className="h-full flex flex-col">
         <SheetTitle className="pl-6 text-2xl font-black mt-4">
-          Async0
+          Λsync0
         </SheetTitle>
 
         {status === "loading" ? (

@@ -2,17 +2,25 @@
 
 import { Button } from "@repo/ui/components/ui/button";
 import { Card, CardContent } from "@repo/ui/components/ui/card";
-import Editor, { Monaco } from "@monaco-editor/react";
+import { Editor, Monaco } from "@monaco-editor/react";
 import {
   CheckCheck,
   ChevronUp,
   Copy,
+  Dot,
   RotateCcw,
   Send,
   Settings,
 } from "lucide-react";
 import { editor } from "monaco-editor";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useTransition,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import {
@@ -28,7 +36,11 @@ import { judge0ValueKeyType } from "@repo/common";
 
 type CodeEditorPropsType = {
   placeholderCode: string;
-  handleTestcaseSubmission: (userFunction: string, run: boolean) => void;
+  problemName: string;
+  handleTestcaseSubmission: (
+    userFunction: string,
+    run: boolean
+  ) => Promise<void>;
   isPending: boolean;
   problemSubmitStatus: judge0ValueKeyType[];
   setProblemSubmitStatus: Dispatch<SetStateAction<judge0ValueKeyType[]>>;
@@ -39,6 +51,7 @@ type CodeEditorPropsType = {
 
 export default function CodeEditor({
   placeholderCode,
+  problemName,
   handleTestcaseSubmission,
   isPending,
   problemSubmitStatus,
@@ -48,7 +61,9 @@ export default function CodeEditor({
   passedtestcases,
 }: CodeEditorPropsType) {
   const { data: session } = useSession();
-  const [value, setValue] = useState<string>(placeholderCode);
+  const [value, setValue] = useState<string>(
+    window.localStorage.getItem(`${problemName}-code`) || placeholderCode
+  );
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const [showMessages, setShowMessages] = useState<boolean>(false);
   const [showConsole, setShowConsole] = useState<boolean>(false);
@@ -58,15 +73,39 @@ export default function CodeEditor({
   const [lineHeight, setLineHeight] = useState<number>(23);
   const [intellisenseActive, setIntellisenseActive] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
+  const [codeSaved, setCodeSaved] = useState<boolean>(false);
+  const [isCodeSavePending, startCodeSaveTransition] = useTransition();
 
   function handleMount(editor: editor.IStandaloneCodeEditor, monaco: Monaco) {
     editorRef.current = editor;
     editor.focus();
 
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-      editor.getAction("editor.action.formatDocument")?.run();
+      startCodeSaveTransition(() => {
+        editor.getAction("editor.action.formatDocument")?.run();
+        if (window) {
+          window.localStorage.setItem(`${problemName}-code`, editor.getValue());
+        }
+        setCodeSaved(true);
+      });
     });
   }
+
+  useEffect(() => {
+    let disposable: any;
+
+    if (editorRef.current) {
+      disposable = editorRef.current.onDidChangeModelContent(() => {
+        if (codeSaved) {
+          setCodeSaved(false);
+        }
+      });
+    }
+
+    return () => {
+      disposable?.dispose();
+    };
+  }, [codeSaved]);
 
   function handleBeforeMount(monaco: Monaco) {
     monaco.editor.defineTheme("custom", {
@@ -130,7 +169,29 @@ export default function CodeEditor({
     <>
       <div className="px-4 pt-2">
         <Tabs defaultValue="problem" className="py-2 ">
-          <TabsList className="w-full flex items-center bg-transparent ">
+          <TabsList className="w-full flex items-center bg-transparent">
+            <div className="flex items-center">
+              <Dot
+                className={`${codeSaved && "text-green-600"} ${isCodeSavePending && "text-yellow-600"}`}
+              />
+              {codeSaved ? (
+                <p
+                  className={`${codeSaved && "text-green-600"} ${isCodeSavePending && "text-yellow-600"} text-xs italic -ml-1`}
+                >
+                  Saved
+                </p>
+              ) : (
+                <p className={`text-xs italic -ml-1`}>Unsaved</p>
+              )}
+              {isCodeSavePending && (
+                <p
+                  className={` ${codeSaved && "text-green-600"} ${isCodeSavePending && "text-yellow-600"} text-xs italic -ml-1`}
+                >
+                  Saving...
+                </p>
+              )}
+            </div>
+
             <div className="ml-auto">
               <Button
                 variant={"ghost"}
@@ -346,9 +407,10 @@ function ShowResults({
     if (showMessages) {
       setShowFirstMessage(false);
       setShowSecondMessage(false);
+      setShowFinalMessage(false);
       const timer1 = setTimeout(() => setShowFirstMessage(true), 1000);
       const timer2 = setTimeout(() => setShowSecondMessage(true), 2000);
-      const timer3 = setTimeout(() => setShowFinalMessage(true), 2600);
+      const timer3 = setTimeout(() => setShowFinalMessage(true), 2000);
 
       return () => {
         clearTimeout(timer1);
@@ -384,11 +446,13 @@ function ShowResults({
                     );
                   }
                 )}
-                <div
-                  className={`mt-2 ${passedtestcases === totaltestcases ? "text-green-400" : passedtestcases === 0 ? "text-red-500" : "text-yellow-600 "} font-bold text-md`}
-                >
-                  {`Testcases passed: ${passedtestcases}/${totaltestcases}`}
-                </div>
+                {problemSubmitStatus[0].status.id != 69 && (
+                  <div
+                    className={`mt-2 ${passedtestcases === totaltestcases ? "text-green-400" : passedtestcases === 0 ? "text-red-500" : "text-yellow-600 "} font-bold text-md`}
+                  >
+                    {`Testcases passed: ${passedtestcases}/${totaltestcases}`}
+                  </div>
+                )}
               </div>
             )
           ) : null}

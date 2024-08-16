@@ -11,6 +11,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LoaderCircle } from "lucide-react";
+import Card3D from "./Card3d";
 
 export default function UserBookmarkedProblems({
   bookmarkedProblems,
@@ -40,8 +41,8 @@ export default function UserBookmarkedProblems({
     });
   }
   return (
-    <div>
-      <Card className="w-[350px] max-h-80 overflow-y-auto">
+    <Card3D>
+      <Card className="w-[350px] max-h-80 overflow-y-auto h-full">
         <CardHeader>
           <CardTitle>Bookmarks</CardTitle>
           <CardDescription>
@@ -76,6 +77,6 @@ export default function UserBookmarkedProblems({
           )}
         </CardContent>
       </Card>
-    </div>
+    </Card3D>
   );
 }

@@ -21,14 +21,7 @@ import { judge0ValueKeyType, unescapeCode } from "@repo/common";
 import AnimatePanel from "./AnimatePanel";
 import ProblemInfoCard from "./ProblemInfoCard";
 import ProblemSolutionCard from "./ProblemSolutionCard";
-import {
-  Bookmark,
-  Problem,
-  Solution,
-  Submission,
-  Testcase,
-  UserSolution,
-} from "@repo/db";
+import { Submission, UserSolution } from "@repo/db";
 import ProblemSubmissionCard from "./ProblemSubmissionCard";
 import { toast } from "sonner";
 import {
@@ -87,7 +80,7 @@ export default function DisplayProblem({
         if (Array.isArray(response)) {
           const firstErrorIndex = response.findIndex(
             (problem: judge0ValueKeyType) =>
-              [4, 5, 6, 7, 8, 9, 10, 11, 12].includes(problem.status.id)
+              [4, 5, 6, 7, 8, 9, 10, 11, 12, 69].includes(problem.status.id)
           );
           setErrorIndex(firstErrorIndex);
           const problemsToShow =
@@ -194,6 +187,7 @@ export default function DisplayProblem({
         >
           <CodeEditor
             placeholderCode={unescapeCode(problem?.starterCode || "") || ""}
+            problemName={problemName}
             handleTestcaseSubmission={handleTestcaseSubmission}
             isPending={isPending}
             problemSubmitStatus={problemSubmitStatus}

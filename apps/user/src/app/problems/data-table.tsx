@@ -35,14 +35,13 @@ import {
   SelectContent,
   SelectItem,
 } from "@repo/ui/components/ui/select";
-import { List, Topic } from "@repo/db";
+import { List, Status, Topic } from "@repo/db";
 import React from "react";
 import { getAllGeneralTopics, getTopicsByList } from "../actions/topics";
 import { Checkbox } from "@repo/ui/components/ui/checkbox";
 import { useSession } from "next-auth/react";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 import { COLUMN_VISIBILITY_BREAKPOINTS } from "@/lib/utils";
-import Card3d from "./_components/Card3d";
 
 type ProblemDetails = userProblemDetailsType | NeetcodeProblemDetails;
 
@@ -200,11 +199,19 @@ export function DataTable<TData extends ProblemDetails>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => {
+                const hasUserSolved = row.getValue("hasUserSolved") as {
+                  Submission: {
+                    status: Status;
+                    passedTestcases: number;
+                    totalTestcases: number;
+                  };
+                }[];
+                const solved = hasUserSolved ? hasUserSolved.length > 0 : false;
                 return (
                   <TableRow
                     key={row.id}
                     onClick={() => handleRowClick(row.getValue("name"))}
-                    className="hover:cursor-pointer hover:text-primary"
+                    className={`hover:cursor-pointer hover:text-primary ${solved && "bg-green-800 text-white hover:bg-green-950 hover:text-white"} `}
                   >
                     {row.getVisibleCells().map((cell) => {
                       if (

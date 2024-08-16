@@ -3,14 +3,11 @@ import type { Config } from "tailwindcss";
 const config = {
   darkMode: ["class"],
   content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
-    "../../packages/ui/**/*{.js,.ts,.jsx,.tsx}",
-    "../../packages/common/**/*{.js,.ts,.jsx,.tsx}",
+    "../../packages/ui/src/components/ui/*{.js,.ts,.jsx,.tsx}",
+    "../../packages/common/src/**/*{.js,.ts,.jsx,.tsx}",
   ],
-  safelist: ["no-scrollbar"],
+
   theme: {
     container: {
       center: true,

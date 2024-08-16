@@ -35,7 +35,7 @@ export default function TextImage() {
         }}
       >
         <Image
-          src={theme === "light" ? text1Dark : text1Light}
+          src={theme ? (theme === "light" ? text1Dark : text1Light) : text1Dark}
           alt="not-a-good-idea"
           priority
         />

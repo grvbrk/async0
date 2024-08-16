@@ -2,10 +2,10 @@
 
 import React, { useState, ReactNode } from "react";
 
-interface Card3DProps {
+type Card3DProps = {
   children?: ReactNode;
   className?: string;
-}
+};
 
 const Card3D: React.FC<Card3DProps> = ({ children, className = "" }) => {
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
@@ -31,7 +31,7 @@ const Card3D: React.FC<Card3DProps> = ({ children, className = "" }) => {
 
   return (
     <div
-      className={`bg-secondary rounded-lg shadow-lg transition-transform duration-300 ease-out ${className}`}
+      className={`rounded-lg shadow-lg transition-transform duration-300 ease-out ${className}`}
       style={{
         transform: `perspective(1000px) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
       }}
