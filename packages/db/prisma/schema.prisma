@@ -33,17 +33,158 @@ enum Status {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now()) @updatedAt
-  role      UserRoles @default(USER)
+  id               String             @id @default(uuid())
+  email            String             @unique
+  role             UserRoles          @default(USER)
+  Bookmark         Bookmark[]
+  Solution         Solution[]
+  UserSolution     UserSolution[]
+  upvoteSolution   UpvoteSolution[]
+  downvoteSolution DownvoteSolution[]
+  Submission       Submission[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @default(now()) @updatedAt
 }
 
 model Problem {
-  id         String     @id @default(uuid())
-  name       String
-  difficulty Difficulty @default(NA)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @default(now()) @updatedAt
+  id               String             @id @default(uuid())
+  name             String
+  difficulty       Difficulty         @default(NA)
+  starterCode      String
+  link             String?
+  rank             Int?
+  timeLimit        Int? // in milliseconds
+  memoryLimit      Int? // in kilobytes
+  TestCase         TestCase[]
+  topic            Topic[]
+  list             List[]
+  Bookmark         Bookmark[]
+  Solution         Solution[]
+  UserSolution     UserSolution[]
+  upvoteSolution   UpvoteSolution[]
+  downvoteSolution DownvoteSolution[]
+  Submission       Submission[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @default(now()) @updatedAt
+
+  @@index([name])
+}
+
+model TestCase {
+  id        String   @id @default(uuid())
+  problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  problemId String
+  input     String
+  output    String
+  isHidden  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([problemId])
+}
+
+model Topic {
+  id        String    @id @default(uuid())
+  name      String
+  problems  Problem[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
+}
+
+model List {
+  id       String    @id @default(uuid())
+  name     String
+  problems Problem[]
+}
+
+model Bookmark {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  problem   Problem  @relation(fields: [problemId], references: [id])
+  problemId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@unique([userId, problemId])
+  @@index([userId])
+  @@index([problemId])
+}
+
+model Solution {
+  id               String             @id @default(uuid())
+  code             String
+  rank             Int                @default(1)
+  problem          Problem            @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  problemId        String
+  upvoteSolution   UpvoteSolution[]
+  downvoteSolution DownvoteSolution[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @default(now()) @updatedAt
+  User             User?              @relation(fields: [userId], references: [id])
+  userId           String?
+
+  @@index([problemId])
+}
+
+model UserSolution {
+  id         String       @id @default(uuid())
+  code       String
+  user       User         @relation(fields: [userId], references: [id])
+  userId     String
+  problem    Problem      @relation(fields: [problemId], references: [id])
+  problemId  String
+  Submission Submission[]
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @default(now()) @updatedAt
+}
+
+model UpvoteSolution {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  problem    Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  problemId  String
+  solution   Solution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
+  solutionId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@unique([userId, solutionId])
+  @@index([userId])
+  @@index([solutionId])
+}
+
+model DownvoteSolution {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  problem    Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  problemId  String
+  solution   Solution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
+  solutionId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@unique([userId, solutionId])
+  @@index([userId])
+  @@index([solutionId])
+}
+
+model Submission {
+  id              String       @id @default(uuid())
+  status          Status       @default(Pending)
+  userId          String
+  problemId       String
+  userSolutionId  String
+  passedTestcases Int
+  totalTestcases  Int
+  updatedAt       DateTime     @default(now()) @updatedAt
+  problem         Problem      @relation(fields: [problemId], references: [id])
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userSolution    UserSolution @relation(fields: [userSolutionId], references: [id])
+  createdAt       DateTime     @default(now())
+
+  @@index([userId])
+  @@index([problemId])
 }
