@@ -1,22 +1,27 @@
-from sqlalchemy import String, DateTime
+from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import UUID
-from datetime import datetime
+from datetime import datetime, timezone
 from . import Base
-import uuid
+from .problem import Problem
+from .association import TopicProblem
+from uuid import uuid4, UUID
 
 
 class Topic(Base):
-    __tablename__ = "topics"
+    __tablename__ = "topic"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     name: Mapped[str] = mapped_column(String)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now())
+    created_at: Mapped[datetime] = mapped_column(
+        default=datetime.now(timezone.utc), index=True
+    )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.now(), onupdate=datetime.now()
+        default=datetime.now(timezone.utc), index=True
     )
-    problems = relationship(
-        "Problem", secondary="topic_problems", back_populates="topics"
+
+    problems: Mapped[list[Problem]] = relationship(
+        lazy="selectin", secondary=TopicProblem, back_populates="topic"
     )
+
+    def __repr__(self):
+        return f"<Topic(id={self.id}, name={self.name})>"

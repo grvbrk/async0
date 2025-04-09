@@ -1,26 +1,34 @@
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import String, DateTime, Enum
-from datetime import datetime
+from sqlalchemy.orm import Mapped, mapped_column, relationship, WriteOnlyMapped
+from sqlalchemy import String, Enum
+from datetime import datetime, timezone
 from .enum import UserRoles
 from . import Base
-import uuid
+from .bookmark import Bookmark
+from .user_solution import UserSolution
+from .upvote_solution import UpvoteSolution
+from .downvote_solution import DownvoteSolution
+from .submission import Submission
+from uuid import uuid4, UUID
 
 
 class User(Base):
     __tablename__ = "user"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
-    email: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    email: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
     role: Mapped[UserRoles] = mapped_column(Enum(UserRoles), default=UserRoles.USER)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now())
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.now(), onupdate=datetime.now()
+    created_at: Mapped[datetime] = mapped_column(
+        default=datetime.now(timezone.utc), index=True
     )
-    bookmarks = relationship("Bookmark", back_populates="user")
-    user_solutions = relationship("UserSolution", back_populates="user")
-    upvotes = relationship("UpvoteSolution", back_populates="user")
-    downvotes = relationship("DownvoteSolution", back_populates="user")
-    submissions = relationship("Submission", back_populates="user")
+    updated_at: Mapped[datetime] = mapped_column(
+        default=datetime.now(timezone.utc), index=True
+    )
+
+    bookmarks: WriteOnlyMapped[Bookmark] = relationship(back_populates="user")
+    user_solutions: WriteOnlyMapped[UserSolution] = relationship(back_populates="user")
+    upvotes: WriteOnlyMapped[UpvoteSolution] = relationship(back_populates="user")
+    downvotes: WriteOnlyMapped[DownvoteSolution] = relationship(back_populates="user")
+    submissions: WriteOnlyMapped[Submission] = relationship(back_populates="user")
+
+    def __repr__(self):
+        return f"<User(id={self.id}, email={self.email}, role={self.role})>"
