@@ -9,7 +9,7 @@ export async function createProblem(data: ProblemBody) {
         method: "POST",
         body: JSON.stringify(data),
         credentials: "include",
-      }
+      },
     );
 
     if (!response.ok) {
@@ -37,7 +37,7 @@ export async function updateProblem(data: ProblemBody, problemID: string) {
         method: "PUT",
         body: JSON.stringify(data),
         credentials: "include",
-      }
+      },
     );
 
     if (!response.ok) {
@@ -62,7 +62,7 @@ export async function getAllProblems(): Promise<{ data: Problem[] }> {
     `${env("NEXT_PUBLIC_BACKEND_URL")}/admin/problems`,
     {
       credentials: "include",
-    }
+    },
   );
 
   if (!response.ok) {
@@ -77,7 +77,7 @@ export async function getProblemById(id: string): Promise<{ data: Problem }> {
     `${env("NEXT_PUBLIC_BACKEND_URL")}/admin/problems/${id}`,
     {
       credentials: "include",
-    }
+    },
   );
 
   if (!response.ok) {

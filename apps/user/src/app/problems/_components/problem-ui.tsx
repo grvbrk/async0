@@ -65,7 +65,7 @@ export default function ProblemUI() {
         <div className="bg-almond dark:bg-charcoal dark:text-almond-dark text-charcoal absolute inset-0 z-50 flex items-center justify-center rounded-md">
           <Loader className="animate-spin" />
           <p className="pl-4 text-center text-sm">
-            {`  Loading problem - ${selectedProblem}`}
+            {` Loading problem - ${selectedProblem}`}
           </p>
         </div>
       )}

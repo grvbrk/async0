@@ -21,12 +21,12 @@ export async function getTopicsByProblemId(problemID: string) {
     {
       method: "GET",
       credentials: "include",
-    }
+    },
   );
 
   if (!res.ok) {
     throw new Error(
-      `Failed to fetch topics: ${res.statusText} for problem ID ${problemID}`
+      `Failed to fetch topics: ${res.statusText} for problem ID ${problemID}`,
     );
   }
 

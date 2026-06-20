@@ -53,8 +53,9 @@ function ListCard({
 
   const radius = 68;
   const circumference = 2 * Math.PI * radius;
-  const targetPercent =
-    (data?.data.total_solved! / data?.data.total_questions!) * 100 || 0;
+  const totalSolved = data?.data?.total_solved ?? 0;
+  const totalQuestions = data?.data?.total_questions ?? 0;
+  const targetPercent = totalQuestions > 0 ? (totalSolved / totalQuestions) * 100 : 0;
   const targetOffset = circumference * (1 - targetPercent / 100);
 
   if (isLoading) {
@@ -70,9 +71,9 @@ function ListCard({
           <div className="space-y-4 p-6">
             <Skeleton className="bg-charcoal/10 dark:bg-almond/10 h-6 w-1/2" />
             <Skeleton className="bg-charcoal/10 dark:bg-almond/10 h-4 w-3/4" />
-            <div className="mt-4 flex items-center justify-between gap-8">
-              <Skeleton className="bg-charcoal/10 dark:bg-almond/10 h-40 w-1/2 rounded-full" />
-              <div className="grow space-y-3">
+            <div className="mt-4 flex flex-row items-center justify-between gap-4 sm:gap-6 lg:flex-col lg:gap-4 xl:flex-row xl:gap-6">
+              <Skeleton className="bg-charcoal/10 dark:bg-almond/10 w-full max-w-[120px] aspect-square rounded-full shrink-0" />
+              <div className="w-full space-y-3">
                 <Skeleton className="bg-charcoal/10 dark:bg-almond/10 h-4 w-full" />
                 <Skeleton className="bg-charcoal/10 dark:bg-almond/10 h-4 w-5/6" />
                 <Skeleton className="bg-charcoal/10 dark:bg-almond/10 h-4 w-2/3" />
@@ -131,12 +132,11 @@ function ListCard({
             {`${data?.data.total_questions} questions • ${data?.data.total_solutions} solutions • ${data?.data.total_user_attempts} attempts`}
           </p>
 
-          <div className="flex items-center justify-between gap-8">
-            <div className="relative">
+          <div className="mt-4 flex flex-row items-center justify-between gap-4 sm:gap-6 lg:flex-col lg:gap-4 xl:flex-row xl:gap-6">
+            <div className="relative w-full max-w-[120px] aspect-square shrink-0">
               <svg
-                width={200}
-                height={200}
-                viewBox={`0 0 ${200} ${200}`}
+                viewBox="0 0 200 200"
+                className="w-full h-full"
                 xmlns="http://www.w3.org/2000/svg"
                 role="progressbar"
                 aria-label="Solved progress"
@@ -167,15 +167,15 @@ function ListCard({
                 </g>
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <motion.span className="font-bold">
+                <motion.span className="text-lg font-bold">
                   {data?.data.total_solved}
                 </motion.span>
-                <span className="text-xs">/{data?.data.total_questions}</span>
-                <span className="text-xs">Solved</span>
+                <span className="text-[10px]">/{data?.data.total_questions}</span>
+                <span className="text-[10px]">Solved</span>
               </div>
             </div>
 
-            <div className="grow space-y-3">
+            <div className="w-full space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-teal-600">Easy</span>
                 <span className="text-muted-foreground text-sm">

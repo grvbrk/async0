@@ -155,12 +155,12 @@ export default function UpdateProblemForm({
   function handleTestCaseChange(
     index: number,
     field: keyof Testcase,
-    value: string
+    value: string,
   ) {
     setFormData((prev) => ({
       ...prev,
       testcases: prev.testcases.map((tc, i) =>
-        i === index ? { ...tc, [field]: value } : tc
+        i === index ? { ...tc, [field]: value } : tc,
       ),
     }));
   }
@@ -168,12 +168,12 @@ export default function UpdateProblemForm({
   function handleSolutionChange(
     index: number,
     field: keyof Solution,
-    value: string | number | boolean
+    value: string | number | boolean,
   ) {
     setFormData((prev) => ({
       ...prev,
       solutions: prev.solutions.map((sol, i) =>
-        i === index ? { ...sol, [field]: value } : sol
+        i === index ? { ...sol, [field]: value } : sol,
       ),
     }));
   }
@@ -237,7 +237,7 @@ export default function UpdateProblemForm({
       newErrors.starter_code = "Starter code is required";
     if (
       formData.testcases.some(
-        (tc) => !tc.ui.trim() || !tc.input.trim() || !tc.output.trim()
+        (tc) => !tc.ui.trim() || !tc.input.trim() || !tc.output.trim(),
       )
     ) {
       newErrors.testcases = "All test case fields are required";
@@ -729,7 +729,7 @@ export default function UpdateProblemForm({
                         handleSolutionChange(
                           index,
                           "description",
-                          e.target.value
+                          e.target.value,
                         )
                       }
                       placeholder="Detailed explanation of the approach..."
@@ -763,7 +763,7 @@ export default function UpdateProblemForm({
                         handleSolutionChange(
                           index,
                           "code_explanation",
-                          e.target.value
+                          e.target.value,
                         )
                       }
                       placeholder="Step-by-step explanation of the code..."
@@ -783,7 +783,7 @@ export default function UpdateProblemForm({
                           handleSolutionChange(
                             index,
                             "time_complexity",
-                            e.target.value
+                            e.target.value,
                           )
                         }
                         placeholder="O(n)"
@@ -801,7 +801,7 @@ export default function UpdateProblemForm({
                           handleSolutionChange(
                             index,
                             "space_complexity",
-                            e.target.value
+                            e.target.value,
                           )
                         }
                         placeholder="O(n)"

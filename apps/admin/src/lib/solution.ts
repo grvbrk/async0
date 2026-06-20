@@ -7,12 +7,12 @@ export async function getSolutionsByProblemId(problemID: string) {
     {
       method: "GET",
       credentials: "include",
-    }
+    },
   );
 
   if (!res.ok) {
     throw new Error(
-      `Failed to fetch solutions: ${res.statusText} for problem ID ${problemID}`
+      `Failed to fetch solutions: ${res.statusText} for problem ID ${problemID}`,
     );
   }
 
